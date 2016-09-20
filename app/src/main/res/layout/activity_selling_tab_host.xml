@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_background"
+    android:padding="3dp"
+    android:orientation="vertical"
+    tools:context=".SellingTabHost">
+
+    <!--Header definition-->
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lblname"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_centerInParent="true"
+                android:text="@string/wlcm"
+                android:textSize="15sp"
+                android:textColor="#ffffff"/>
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="33dp"
+                android:onClick="logout"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/logout_button"
+                android:id="@+id/button" />
+        </RelativeLayout>
+    </TableRow>
+
+    <!--Body definition-->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TabHost
+            android:id="@android:id/tabhost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:tabStripEnabled="false"
+                    android:divider="@drawable/tabdivider" />
+
+                <FrameLayout
+                    android:layout_below="@android:id/tabs"
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </TabHost>
+    </TableRow>
+</LinearLayout>

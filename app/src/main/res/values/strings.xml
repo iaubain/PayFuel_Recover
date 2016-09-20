@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">PayFuel</string>
+    <string name="invaliddata">Invalid Entry</string>
+    <string name="successnotification">success</string>
+    <string name="faillurenotification">failed</string>
+    <string name="emptypaymode">Empty payment Mode</string>
+    <string name="nulluifeedback">Null FeedBack</string>
+    <string name="emptyfield">Empty Field(s)</string>
+    <string name="loginurl">http://41.74.172.132:8080/PayFuel/AndroidWebService/pos/login</string>
+    <string name="logouturl">http://41.74.172.132:8080/PayFuel/AndroidWebService/pos/logout</string>
+    <string name="pumpurl">http://41.74.172.132:8080/PayFuel/PumpManagementService/pumpsbyuser/</string>
+    <string name="paymenturl">http://41.74.172.132:8080/PayFuel/PaymentModeManagementService/paymentmodes/</string>
+    <string name="transactionurl">http://41.74.172.132:8080/PayFuel/AndroidWebService/pos/sale</string>
+    <string name="registerdeviceurl">http://41.74.172.132:8080/PayFuel/DeviceManagementService/device/register</string>
+    <string name="registerpumps">http://41.74.172.132:8080/PayFuel/PumpManagementService/assignUserToPumpNozzle</string>
+    <string name="syncurl">http://41.74.172.132:8080/PayFuel/AndroidWebService/pos/sale/sync</string>
+    <string name="checktransaction">http://41.74.172.132:8080/PayFuel/AndroidWebService/pos/sale/async</string>
+    <string name="mytransactions">http://41.74.172.132:8080/PayFuel/TransactionManagementService/transactions/day</string>
+    <string name="adminlogin">http://41.74.172.132:8080/PayFuel/AndroidWebService/pos/adminLogin</string>
+    <string name="post">POST</string>
+    <string name="get">GET</string>
+    <string name="connectionerror">Server/Connectivity Error</string>
+    <string name="ambiguous">Ambiguous response</string>
+    <string name="deviceregfail">Device Registration failed</string>
+    <string name="loginproblem">Login Problem</string>
+    <string name="userid">userId</string>
+    <string name="title_activity_selling">Selling</string>
+    <string name="wlcm">Welcome </string>
+    <string-array name="companydetail">
+        <item>SP</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

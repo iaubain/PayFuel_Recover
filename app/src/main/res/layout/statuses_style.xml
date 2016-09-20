@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+
+    <ImageView
+        android:id="@+id/nozzleicon"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="10dp"
+        android:padding="5dp"
+        android:background="@drawable/nozzle_blue"/>
+
+
+        <TextView
+            android:id="@+id/nozzlename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nozzle Name"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_marginStart="10dp"
+            android:padding="2dp"
+            android:textColor="#33CC33" />
+        <TextView
+            android:id="@+id/nozzleproduct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="nozzleproduct"
+            android:layout_marginStart="10dp"/>
+        <TextView
+            android:id="@+id/index"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Index: "
+            android:layout_marginStart="10dp"/>
+
+        <TextView
+            android:id="@+id/pumpname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="pumpname"
+            android:layout_marginStart="10dp"/>
+        <TextView
+            android:id="@+id/nozzleid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="10dp"/>
+        <TextView
+            android:id="@+id/pumpid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="10dp"/>
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="10dp"/>
+        <TextView
+            android:id="@+id/productid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="10dp"/>
+
+
+</LinearLayout>

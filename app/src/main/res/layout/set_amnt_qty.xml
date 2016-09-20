@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/nozzlelayout"
+    android:orientation="vertical"
+    android:padding="4dp"
+    tools:context="com.aub.oltranz.payfuel.Selling">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/darkgray"
+        android:text="Monitor"
+        android:id="@+id/tv"
+        android:layout_gravity="center_horizontal"/>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tv"
+        android:layout_marginBottom="52dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_centerVertical="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center">
+                        <EditText
+                            android:layout_width="145dp"
+                            android:layout_height="75dp"
+                            android:layout_marginRight="2dp"
+                            android:gravity="center"
+                            android:background="@drawable/edit_text_shape"
+                            android:id="@+id/amnt"
+                            android:textSize="20dp"
+                            android:inputType="phone"
+                            android:hint="Fill the Amount"
+                            android:layout_gravity="center_horizontal" />
+
+                        <EditText
+                            android:layout_width="145dp"
+                            android:layout_height="75dp"
+                            android:background="@drawable/edit_text_shape"
+                            android:gravity="center"
+                            android:id="@+id/qty"
+                            android:textSize="20dp"
+                            android:inputType="phone"
+                            android:hint="Fill the Quantity"
+                            android:layout_gravity="center_horizontal" />
+                    </TableRow>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Amount"
+                            android:textColor="@color/appcolor"/>
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:text=""/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Quantity"
+                            android:textColor="@color/appcolor"/>
+
+                    </TableRow>
+                </RelativeLayout>
+
+            </TableRow>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/platenumber"
+                android:background="@drawable/border_normal"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textSize="20dp"
+                android:hint="Fill the Plate Number"
+                android:layout_gravity="center_horizontal" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/border_normal"
+                android:gravity="center"
+                android:id="@+id/tin"
+                android:textSize="20dp"
+                android:hint="Fill the TIN Number"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/border_normal"
+                android:gravity="center"
+                android:id="@+id/name"
+                android:textSize="20dp"
+                android:hint="Fill the Company Name"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="right"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:background="@color/tab_highlight"
+                android:text="Company?"
+                android:id="@+id/what" />
+        </LinearLayout>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="4dp"
+        android:gravity="center">
+        <Button
+            android:layout_width="145dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:background="@drawable/button_shape_negative"
+            android:textColor="@color/nearblack"
+            android:textStyle="bold"
+            android:text="CANCEL"
+            android:id="@+id/cancel" />
+
+        <Button
+            android:layout_width="145dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/positive"
+            android:textStyle="bold"
+            android:background="@drawable/button_shape_positive"
+            android:text="PAY"
+            android:id="@+id/pay" />
+
+    </TableRow>
+
+</RelativeLayout>

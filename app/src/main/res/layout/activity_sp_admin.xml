@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_background"
+    android:padding="4dp"
+    tools:context="com.aub.oltranz.payfuel.spadmin.SpAdmin">
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/headerRow">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lblname"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_centerInParent="true"
+                android:text="@string/wlcm"
+                android:textSize="15sp"
+                android:textColor="#ffffff"/>
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="33dp"
+                android:onClick="logout"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/logout_button"
+                android:id="@+id/button" />
+        </RelativeLayout>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_below="@+id/headerRow"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/monitorHolder">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:id="@+id/adminMonitor"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_centerInParent="true"
+            android:text=""
+            android:textSize="15sp"/>
+
+    </TableRow>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_container"
+        android:layout_below="@+id/monitorHolder"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

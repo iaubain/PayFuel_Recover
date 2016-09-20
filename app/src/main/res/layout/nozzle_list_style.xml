@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/nozzleicon"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:padding="2dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"/>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/details"
+            android:layout_toRightOf="@+id/nozzleicon"
+            android:layout_toLeftOf="@+id/buttonHolder"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/nozzlename"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:ellipsize="marquee"
+                android:text="Nozzle Name"
+                android:textSize="12sp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:padding="2dp"
+                android:textColor="#33CC33" />
+            <TextView
+                android:id="@+id/nozzleproduct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="nozzleproduct"
+                android:layout_marginStart="10dp"/>
+            <TextView
+                android:id="@+id/index"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="Index: "
+                android:layout_marginLeft="10dp"/>
+
+            <TextView
+                android:id="@+id/nozzleindicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="indicator"
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"/>
+        </LinearLayout>
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp"
+            android:id="@+id/buttonHolder"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true">
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="4dp"
+                android:textColor="@color/positive"
+                android:text="Ѵ"
+                android:background="@drawable/ic_action_positive"
+                android:id="@+id/accept" />
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:textColor="@color/error"
+                android:text="X"
+                android:background="@drawable/ic_action_negative"
+                android:id="@+id/refuse" />
+        </TableRow>
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/details">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="TransactionId"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:id="@+id/transid" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Product Info"
+                    android:id="@+id/prodinfo" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Payinfo"
+                    android:id="@+id/payinfo" />
+
+            </LinearLayout>
+
+        </TableRow>
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/print"
+            android:text="PRINT"
+            android:textColor="@color/positive"
+            android:textStyle="bold"
+            android:background="@drawable/ic_action_positive"/>
+    </RelativeLayout>
+
+</LinearLayout>
