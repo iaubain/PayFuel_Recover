@@ -2,9 +2,11 @@ package com.aub.oltranz.payfuel;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -301,21 +303,26 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
                 }
                 ImageView pumpImg = (ImageView) pumpView.findViewById(R.id.icon);
                 TextView pumpLabel = (TextView) pumpView.findViewById(R.id.indicator);
+                TextView pumpName = (TextView) pumpView.findViewById(R.id.pumpname);
                 if (nozzleDenialCheck > 0) {
                     pumpImg.setImageResource(R.drawable.pump_red);
-                    pumpLabel.setText("Nozzle(s) rejected");
+                    pumpLabel.setText("Rejected");
+                    pumpName.setTextColor(context.getResources().getColor(R.color.error));
                     pumpLabel.setTextColor(context.getResources().getColor(R.color.error));
                 } else if (nozzleAcceptCheck > 0) {
-                    pumpLabel.setText("Nozzle(s) Accepted");
-                    pumpLabel.setTextColor(context.getResources().getColor(R.color.rdcolor));
+                    pumpLabel.setText("Accepted");
+                    pumpName.setTextColor(context.getResources().getColor(R.color.green));
+                    pumpLabel.setTextColor(context.getResources().getColor(R.color.green));
                     pumpImg.setImageResource(R.drawable.pump_green);
                 }else if(nozzleTakenCheck>0){
-                    pumpLabel.setText("Nozzle(s) taken");
+                    pumpLabel.setText("Taken");
+                    pumpName.setTextColor(context.getResources().getColor(R.color.rdoff));
                     pumpLabel.setTextColor(context.getResources().getColor(R.color.rdoff));
                     pumpImg.setImageResource(R.drawable.pump_gray);
                 } else {
                     pumpLabel.setText("Available to Choose");
-                    pumpLabel.setTextColor(context.getResources().getColor(R.color.rdoff));
+                    pumpName.setTextColor(context.getResources().getColor(R.color.positive));
+                    pumpLabel.setTextColor(context.getResources().getColor(R.color.positive));
                     pumpImg.setImageResource(R.drawable.pump_blue);
                 }
 
@@ -645,43 +652,61 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
     public void logout(View v){
         Log.v(tag, "Logging out...");
 
-        if (doubleBackToExitPressedOnce) {
-            Intent logoutIntent=new Intent(this, LogoutService.class);
-            Bundle logotBundle=new Bundle();
-            logotBundle.putInt("userId",userId);
-            DeviceIdentity di=db.getSingleDevice();
-            logotBundle.putString("deviceNo",di.getDeviceNo());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.dialog_message)
+                .setTitle(R.string.dialog_title);
 
-            logoutIntent.putExtras(logotBundle);
-
-            this.startService(logoutIntent);
-
-
-            Calendar cal = Calendar.getInstance();
-            Intent alarmIntent = new Intent(context, CheckTransaction.class);
-            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            //clean alarm cache for previous pending intent
-            alarm.cancel(pintent);
-
-            intent=new Intent(this,Home.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            finish();
-            startActivity(intent);
+        // Add the buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                // User clicked OK button
+                //            DeviceIdentity di=db.getSingleDevice();
+//            LogoutData ld=new LogoutData();
+//            try {
+//                ld.setDevId(di.getDeviceNo());
+//                ld.setUserId(userId);
+//                mc=new MapperClass();
+//
+//                handleUrl=new HandleUrl(this,this,getResources().getString(R.string.logouturl),getResources().getString(R.string.post),mc.mapping(ld));
+//            }catch (Exception e){
+//                uiFeedBack(e.getMessage());
+//            }
 
 
-            return;
-        }
+                //unregisterReceiver(broadcastReceiver);
 
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click Logout again to exit", Toast.LENGTH_SHORT).show();
+                Intent logoutIntent=new Intent(getApplicationContext(), LogoutService.class);
+                Bundle logotBundle=new Bundle();
+                logotBundle.putInt("userId",userId);
+                DeviceIdentity di=db.getSingleDevice();
+                logotBundle.putString("deviceNo",di.getDeviceNo());
 
-        new Handler().postDelayed(new Runnable() {
+                logoutIntent.putExtras(logotBundle);
 
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
+                startService(logoutIntent);
+
+
+                Calendar cal = Calendar.getInstance();
+                Intent alarmIntent = new Intent(context, CheckTransaction.class);
+                PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+                AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                //clean alarm cache for previous pending intent
+                alarm.cancel(pintent);
+
+                intent=new Intent(getApplicationContext(),Home.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                finish();
+                startActivity(intent);
             }
-        }, 2000);
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

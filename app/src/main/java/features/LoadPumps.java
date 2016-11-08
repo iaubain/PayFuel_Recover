@@ -57,11 +57,9 @@ public class LoadPumps implements HandleUrlInterface {
             }else{
                 db.truncatePumps();
                 db.truncateNozzles();
-                List<Tanks> urlTankList=lpr.getUrlTankList();
-                Iterator iterator=urlTankList.iterator();
-                for(Tanks tank: urlTankList){
-                    List<UrlPumps> urlPumps=tank.getPumps();
-                    for(UrlPumps up:urlPumps){
+                List<UrlPumps> urlPumpsList=lpr.getPumps();
+
+                    for(UrlPumps up:urlPumpsList){
                         if(!isPumpAvailable(up.getPumpId())){
                             //if pump is not found
                             Pump pump=new Pump();
@@ -131,7 +129,7 @@ public class LoadPumps implements HandleUrlInterface {
                             }
                         }
                     }
-                }
+
                 pumpLoaded=true;
             }
 

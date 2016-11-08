@@ -7,7 +7,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Generate Reciept?"
+        android:text="@string/receipt_box"
         android:id="@+id/textView3"
         android:layout_gravity="center_horizontal" />
 
@@ -17,22 +17,33 @@
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal">
 
-        <Button
-            android:layout_width="145dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:textColor="@color/nearblack"
-            android:background="@drawable/button_shape_negative"
-            android:text="NO"
-            android:id="@+id/no" />
+        <LinearLayout
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_marginEnd="50dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:textColor="@drawable/text_button_negative"
+                android:background="@drawable/button_shape_negative"
+                android:text="NO"
+                android:id="@+id/no" />
 
-        <Button
-            android:layout_width="145dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/positive"
-            android:background="@drawable/button_shape_positive"
-            android:text="YES"
-            android:id="@+id/yes" />
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textColor="@drawable/text_button_positive"
+                android:background="@drawable/button_shape_positive"
+                android:text="YES"
+                android:id="@+id/yes" />
+
+        </LinearLayout>
 
     </TableRow>
 </LinearLayout>

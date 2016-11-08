@@ -6,18 +6,14 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.util.UUID;
 
 import appBean.DeviceRegistrationResponse;
 import databaseBean.DBHelper;
@@ -31,8 +27,9 @@ import models.MapperClass;
 public class RegisterDevice extends ActionBarActivity implements HandleUrlInterface{
 
     String tag="PayFuel: "+getClass().getSimpleName();
-    TextView tv, loginLink, spAdminLink;
+    TextView tv;
     EditText userName, password,devName,reDevName;
+    ImageView loginLink, admin;
     Button reg;
     String devRegUrl, deviceSerial,deviceName;
     Context context;
@@ -61,8 +58,8 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
     public void initActUI(){
         Log.d(tag,"Initialize Activity UI");
         tv=(TextView) findViewById(R.id.tv);
-        loginLink=(TextView) findViewById(R.id.loginLink);
-        spAdminLink=(TextView) findViewById(R.id.spAdminLink);
+        loginLink=(ImageView) findViewById(R.id.loginLink);
+        admin =(ImageView) findViewById(R.id.adminLink);
         userName=(EditText) findViewById(R.id.username);
         password=(EditText) findViewById(R.id.pw);
         devName=(EditText) findViewById(R.id.devname);
@@ -86,15 +83,15 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
         startActivity(intent);
     }
 
-    public void spAdmin(View v){
-        Log.d(tag,"SP Admin Triggered");
-        Intent intent = getPackageManager().getLaunchIntentForPackage("com.payfuel.spadmin.spadmin");
+    public void myAdmin(View v){
+        Log.d(tag,"ENGEN Admin Triggered");
+        Intent intent = getPackageManager().getLaunchIntentForPackage("com.olranz.payfuel.myadmin");
         if (intent != null) {
             // We found the activity now start the activity
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } else {
-            uiFeedBack("SP Admin App Is Missing...!");
+            uiFeedBack("ENGEN Admin App Is Missing...!");
         }
     }
 

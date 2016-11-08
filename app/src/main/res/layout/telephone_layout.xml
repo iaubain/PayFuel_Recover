@@ -33,7 +33,7 @@
             android:layout_width="145dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="4dp"
-            android:textColor="@color/nearblack"
+            android:textColor="@drawable/text_button_negative"
             android:background="@drawable/button_shape_negative"
             android:text="CANCEL"
             android:id="@+id/cancel" />
@@ -42,7 +42,7 @@
             android:layout_width="145dp"
             android:layout_height="wrap_content"
             android:text="DONE"
-            android:textColor="@color/positive"
+            android:textColor="@drawable/text_button_positive"
             android:background="@drawable/button_shape_positive"
             android:id="@+id/done" />
     </TableRow>

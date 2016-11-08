@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:text="EXIT"
-            android:textColor="@color/positive"
+            android:textColor="@drawable/text_button_positive"
             android:background="@drawable/button_shape_positive"
             android:id="@+id/done" />
 

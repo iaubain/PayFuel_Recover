@@ -1,6 +1,7 @@
 package features;
 
 import android.app.Activity;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +36,6 @@ public class PumpListAdapter extends ArrayAdapter<Pump> {
 
     public PumpListAdapter(Activity context,int userId, List<Pump> pumps) {
         super(context, R.layout.pump_list_style, pumps);
-        // TODO Auto-generated constructor stub
         Log.d(tag,"Construct Pump List Adapter");
         this.context=context;
         this.userId=userId;
@@ -92,17 +92,23 @@ public class PumpListAdapter extends ArrayAdapter<Pump> {
 
         if(nozzleDenialCheck > 0){
             pumpImg.setImageResource(R.drawable.pump_red);
-            pumpLabel.setText("Nozzle(s) Rejected");
+            pumpLabel.setText("Rejected");
+            pumpName.setTextColor(context.getResources().getColor(R.color.error));
             pumpLabel.setTextColor(context.getResources().getColor(R.color.error));
         } else if(nozzleAcceptCheck > 0){
-            pumpLabel.setText("Nozzle(s) Accepted");
-            pumpLabel.setTextColor(context.getResources().getColor(R.color.rdcolor));
+            pumpLabel.setText("Accepted");
+            pumpName.setTextColor(context.getResources().getColor(R.color.green));
+            pumpLabel.setTextColor(context.getResources().getColor(R.color.green));
             pumpImg.setImageResource(R.drawable.pump_green);
         }else if(nozzleTaken>0){
-                pumpLabel.setText("Nozzle(s) taken");
-                pumpImg.setImageResource(R.drawable.pump_gray);
+            pumpLabel.setText("Taken");
+            pumpName.setTextColor(context.getResources().getColor(R.color.rdcolor));
+            pumpLabel.setTextColor(context.getResources().getColor(R.color.rdcolor));
+            pumpImg.setImageResource(R.drawable.pump_gray);
         }else{
-            pumpLabel.setText("Available to Choose");
+            pumpLabel.setText("Available");
+            pumpName.setTextColor(context.getResources().getColor(R.color.rdcolor));
+            pumpLabel.setTextColor(context.getResources().getColor(R.color.rdcolor));
             //pumpLabel.setTextColor(context.getResources().getColor(R.color.rdoff));
             pumpImg.setImageResource(R.drawable.pump_blue);
         }

@@ -164,32 +164,51 @@ public class AppMainService extends Service {
 
                 stopService();
             }
-        List<AsyncTransaction> ats=db.getAllAsyncTransactions(userId);
-        if(!ats.isEmpty()){
-            for(AsyncTransaction at:ats){
-                MapperClass mc=new MapperClass();
-                String asyncData=mc.mapping(at);
-                if(!TextUtils.isEmpty(asyncData)&&(!TextUtils.isEmpty(url)) ){
-                    CheckTrans trans = new CheckTrans();
-                    if(at.getSum()<=12) {
-                        SellingTransaction st=db.getSingleTransaction(at.getDeviceTransactionId());
-                        if(st.getStatus()==500 || st.getStatus()==100){
-                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
-                        }
-                        else
-                            trans.execute(asyncData);
-                    }
-                    else{
-                        db.deleteAsyncTransaction(at.getDeviceTransactionId());
+            List<SellingTransaction> sellingTransactions=db.getAllUnsuccessfulTransaction(userId);
+        if(!sellingTransactions.isEmpty()){
+            for(SellingTransaction sts: sellingTransactions){
 
-                        //transaction TimeOut
-                        SellingTransaction st=db.getSingleTransaction(at.getDeviceTransactionId());
-                        if(st.getStatus()==301 || st.getStatus()==302)
-                            st.setStatus(500);
-                        db.updateTransaction(st);
+                    AsyncTransaction at=db.getSingleAsyncPerTransacton(sts.getDeviceTransactionId());
+                Log.d(tag,"Async Data \n"+new MapperClass().mapping(at));
+                if(at != null){
+                    if(at.getSum()<=30){
+                        Log.d(tag,"Async Data To Check On Server \n"+new MapperClass().mapping(at));
+                        at.setSum(at.getSum()+1);
+                        db.updateAsyncTransaction(at);
+                        new CheckTrans().execute(new MapperClass().mapping(at));
+                    }else{
+                        Log.d(tag,"Async Data Deleted \n"+new MapperClass().mapping(at));
+                        db.deleteAsyncTransaction(sts.getDeviceTransactionId());
+                        sts.setStatus(500);
+                        db.updateTransaction(sts);
                     }
-                }
+                }else
+                    stopService();
             }
+//            for(AsyncTransaction at:ats){
+//                MapperClass mc=new MapperClass();
+//                String asyncData=mc.mapping(at);
+//                if(!TextUtils.isEmpty(asyncData)&&(!TextUtils.isEmpty(url)) ){
+//                    CheckTrans trans = new CheckTrans();
+//                    if(at.getSum()<=1200) {//revert it to near 20
+////                        SellingTransaction st=db.getSingleTransaction(at.getDeviceTransactionId());
+////                        if(st.getStatus()==500 || st.getStatus()==100){
+////                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
+////                        }
+////                        else
+//                            trans.execute(asyncData);
+//                    }
+////                    else{
+////                        db.deleteAsyncTransaction(at.getDeviceTransactionId());
+////
+////                        //transaction TimeOut
+////                        SellingTransaction st=db.getSingleTransaction(at.getDeviceTransactionId());
+////                        if(st.getStatus()==301 || st.getStatus()==302)
+////                            st.setStatus(500);
+////                        db.updateTransaction(st);
+////                    }
+//                }
+//            }
         }else{
             stopService();
         }
@@ -282,125 +301,146 @@ public class AppMainService extends Service {
                     }else{
                     final SellingTransaction st=db.getSingleTransaction(at.getDeviceTransactionId());
                     //a transaction has been rejected
-                    if(ar.getStastusCode()==500){
-                        st.setStatus(500);
-                        db.updateTransaction(st);
-                        //delete it from the pending task
-                        db.deleteAsyncTransaction(at.getDeviceTransactionId());
-                    }else if(ar.getStastusCode()==301){
-                        st.setStatus(301);
-                        db.updateTransaction(st);
-                        AsyncTransaction async=db.getSingleAsyncPerTransacton(st.getDeviceTransactionId());
-                        async.setSum(async.getSum()+1);
-                        Log.d(tag,"the pending transaction: "+st.getDeviceTransactionId()+" has checksum: "+async.getSum());
-                        db.updateAsyncTransaction(async);
-                    }else if(ar.getStastusCode()==100){
-                        if(st.getStatus()==302){
-                            st.setStatus(100);
-                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
+
+                        if(((st.getStatus()==101 ||st.getStatus()==302) || (st.getStatus()==501 || st.getStatus()==500))&& ar.getStastusCode()==100){
+                            //update the database
+                            st.setStatus(ar.getStastusCode());
                             db.updateTransaction(st);
+                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
 
                             Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
                             nozzle.setNozzleIndex(nozzle.getNozzleIndex()+st.getQuantity());
 
                             //Updating Nozzle indexes
                             db.updateNozzle(nozzle);
-                            //__________________Print if the status was generated to generate receipt_____________________\\
 
-                            Runnable runnable = new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.v(tag,"Running a printing thread");
-                                    try{
-                                            TransactionPrint tp=new TransactionPrint();
+                            //print the receipt
+                            generateReceipt(st);
 
-                                            tp.setAmount(st.getAmount());
-                                            tp.setQuantity(st.getQuantity());
-                                            tp.setBranchName(db.getSingleUser(userId).getBranch_name());
-                                            tp.setDeviceId(db.getSingleDevice().getDeviceNo());
-                                            tp.setUserName(db.getSingleUser(userId).getName());
-                                            tp.setDeviceTransactionId(String.valueOf(at.getDeviceTransactionId()));
-                                            tp.setDeviceTransactionTime(st.getDeviceTransactionTime());
-                                            tp.setNozzleName(db.getSingleNozzle(st.getNozzleId()).getNozzleName());
-                                            tp.setPaymentMode(db.getSinglePaymentMode(st.getPaymentModeId()).getName());
-
-                                            if(st.getPlateNumber()!=null)
-                                                tp.setPlateNumber(st.getPlateNumber());
-                                            else
-                                                tp.setPlateNumber("N/A");
-
-                                            tp.setProductName(db.getSingleNozzle(st.getNozzleId()).getProductName());
-                                            tp.setPumpName(db.getSinglePump(st.getPumpId()).getPumpName());
-
-                                            if(st.getTelephone()!=null)
-                                                tp.setTelephone(st.getTelephone());
-                                            else
-                                                tp.setTelephone("N/A");
-
-                                            if(st.getTin()!=null)
-                                                tp.setTin(st.getTin());
-                                            else
-                                                tp.setTin("N/A");
-
-                                            if(st.getVoucherNumber()!=null)
-                                                tp.setVoucherNumber(st.getVoucherNumber());
-                                            else
-                                                tp.setVoucherNumber("N/A");
-
-                                            if(st.getName()!=null)
-                                                tp.setCompanyName(st.getName());
-                                            else
-                                                tp.setCompanyName("N/A");
-
-                                            if(st.getStatus()==100 || st.getStatus()==101){
-                                                tp.setPaymentStatus("Success");
-                                                //launch printing procedure
-                                                PrintHandler ph=new PrintHandler(context,tp);
-                                                String print=ph.transPrint();
-                                                if(!print.equalsIgnoreCase("Success")){
-                                                    Log.e(tag,print);
-                                                }
-                                            }else{
-                                                //Update the status to generate the the print out finally
-                                                if(st.getStatus()!=500){
-                                                    st.setStatus(st.getStatus()+1);
-
-                                                    long dbId=db.updateTransaction(st);
-                                                    if(dbId<=0){
-                                                        Log.e(tag,"Failed to generate receipt");
-                                                    }
-                                                }
-                                            }
-
-                                    }catch (Exception e){
-                                        Log.e(tag,e.getMessage());
-                                        e.printStackTrace();
-                                    }
-                                }
-                            };
-                            new Thread(runnable).start();
-
-                            Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh_main");
-                            sendBroadcast(i);
-                            //________________________________________\\
                         }else{
-                            st.setStatus(100);
-                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
-                            db.updateTransaction(st);
 
-                            Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
-                            nozzle.setNozzleIndex(nozzle.getNozzleIndex() + st.getQuantity());
-
-                            //Updating Nozzle indexes
-                           db.updateNozzle(nozzle);
-                               Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh_main");
-                               sendBroadcast(i);
-
+                            if(ar.getStastusCode()==500){
+                                st.setStatus(ar.getStastusCode());
+                                db.updateTransaction(st);
+                                db.deleteAsyncTransaction(at.getDeviceTransactionId());
+                            }
                         }
-                    }else{
-                        st.setStatus(500);
-                        db.updateTransaction(st);
-                    }
+//                    if(ar.getStastusCode()==500 && st.getStatus()==500){
+//                        st.setStatus(500);
+//                        db.updateTransaction(st);
+//                        //delete it from the pending task
+//                        db.deleteAsyncTransaction(at.getDeviceTransactionId());
+//                    }else if(ar.getStastusCode()==301){
+//                        st.setStatus(301);
+//                        db.updateTransaction(st);
+//                        AsyncTransaction async=db.getSingleAsyncPerTransacton(st.getDeviceTransactionId());
+//                        async.setSum(async.getSum()+1);
+//                        Log.d(tag,"the pending transaction: "+st.getDeviceTransactionId()+" has checksum: "+async.getSum());
+//                        db.updateAsyncTransaction(async);
+//                    }else if(ar.getStastusCode()==100){
+//                        if(st.getStatus()==302 || st.getStatus()==501|| st.getStatus()==301){
+//                            st.setStatus(100);
+//                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
+//                            db.updateTransaction(st);
+//
+//                            Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
+//                            nozzle.setNozzleIndex(nozzle.getNozzleIndex()+st.getQuantity());
+//
+//                            //Updating Nozzle indexes
+//                            db.updateNozzle(nozzle);
+//                            //__________________Print if the status was generated to generate receipt_____________________\\
+//
+//                            Runnable runnable = new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Log.v(tag,"Running a printing thread");
+//                                    try{
+//                                            TransactionPrint tp=new TransactionPrint();
+//
+//                                            tp.setAmount(st.getAmount());
+//                                            tp.setQuantity(st.getQuantity());
+//                                            tp.setBranchName(db.getSingleUser(userId).getBranch_name());
+//                                            tp.setDeviceId(db.getSingleDevice().getDeviceNo());
+//                                            tp.setUserName(db.getSingleUser(userId).getName());
+//                                            tp.setDeviceTransactionId(String.valueOf(at.getDeviceTransactionId()));
+//                                            tp.setDeviceTransactionTime(st.getDeviceTransactionTime());
+//                                            tp.setNozzleName(db.getSingleNozzle(st.getNozzleId()).getNozzleName());
+//                                            tp.setPaymentMode(db.getSinglePaymentMode(st.getPaymentModeId()).getName());
+//
+//                                            if(st.getPlateNumber()!=null)
+//                                                tp.setPlateNumber(st.getPlateNumber());
+//                                            else
+//                                                tp.setPlateNumber("N/A");
+//
+//                                            tp.setProductName(db.getSingleNozzle(st.getNozzleId()).getProductName());
+//                                            tp.setPumpName(db.getSinglePump(st.getPumpId()).getPumpName());
+//
+//                                            if(st.getTelephone()!=null)
+//                                                tp.setTelephone(st.getTelephone());
+//                                            else
+//                                                tp.setTelephone("N/A");
+//
+//                                            if(st.getTin()!=null)
+//                                                tp.setTin(st.getTin());
+//                                            else
+//                                                tp.setTin("N/A");
+//
+//                                            if(st.getVoucherNumber()!=null)
+//                                                tp.setVoucherNumber(st.getVoucherNumber());
+//                                            else
+//                                                tp.setVoucherNumber("N/A");
+//
+//                                            if(st.getName()!=null)
+//                                                tp.setCompanyName(st.getName());
+//                                            else
+//                                                tp.setCompanyName("N/A");
+//
+////                                            if(st.getStatus()==100 || st.getStatus()==101){
+//                                                tp.setPaymentStatus("Success");
+//                                                //launch printing procedure
+//                                                PrintHandler ph=new PrintHandler(context,tp);
+//                                                String print=ph.transPrint();
+//                                                if(!print.equalsIgnoreCase("Success")){
+//                                                    Log.e(tag,print);
+//                                                }
+////                                            }else{
+////                                                //Update the status to generate the the print out finally
+////                                                if(st.getStatus()!=500){
+////                                                    st.setStatus(st.getStatus()+1);
+////
+////                                                    long dbId=db.updateTransaction(st);
+////                                                    if(dbId<=0){
+////                                                        Log.e(tag,"Failed to generate receipt");
+////                                                    }
+////                                                }
+////                                            }
+//
+//                                    }catch (Exception e){
+//                                        Log.e(tag,e.getMessage());
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            };
+//                            new Thread(runnable).start();
+//
+//                            Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh_main");
+//                            sendBroadcast(i);
+//                            //________________________________________\\
+//                        }else{
+//                            st.setStatus(100);
+//                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
+//                            db.updateTransaction(st);
+//
+//                            Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
+//                            nozzle.setNozzleIndex(nozzle.getNozzleIndex() + st.getQuantity());
+//
+//                            //Updating Nozzle indexes
+//                           db.updateNozzle(nozzle);
+//                               Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh_main");
+//                               sendBroadcast(i);
+//
+//                        }
+//                    }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -409,10 +449,72 @@ public class AppMainService extends Service {
                 }
 
             }
-            //Delete on time out
-//            db.deletequeue(Long.parseLong(jo.get("traId").toString()));
-//            Intent intent = new Intent("com.example.owner.petrolmanager.PRINTING").putExtra("msg", "Time Out for " + jo.get("traId").toString());
-//            sendBroadcast(intent);
+        }
+
+        protected void generateReceipt(final SellingTransaction st){
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    Log.v(tag,"Running a printing thread");
+                    try{
+                        TransactionPrint tp=new TransactionPrint();
+
+                        tp.setAmount(st.getAmount());
+                        tp.setQuantity(st.getQuantity());
+                        tp.setBranchName(db.getSingleUser(userId).getBranch_name());
+                        tp.setDeviceId(db.getSingleDevice().getDeviceNo());
+                        tp.setUserName(db.getSingleUser(userId).getName());
+                        tp.setDeviceTransactionId(String.valueOf(st.getDeviceTransactionId()));
+                        tp.setDeviceTransactionTime(st.getDeviceTransactionTime());
+                        tp.setNozzleName(db.getSingleNozzle(st.getNozzleId()).getNozzleName());
+                        tp.setPaymentMode(db.getSinglePaymentMode(st.getPaymentModeId()).getName());
+
+                        if(st.getPlateNumber()!=null)
+                            tp.setPlateNumber(st.getPlateNumber());
+                        else
+                            tp.setPlateNumber("N/A");
+
+                        tp.setProductName(db.getSingleNozzle(st.getNozzleId()).getProductName());
+                        tp.setPumpName(db.getSinglePump(st.getPumpId()).getPumpName());
+
+                        if(st.getTelephone()!=null)
+                            tp.setTelephone(st.getTelephone());
+                        else
+                            tp.setTelephone("N/A");
+
+                        if(st.getTin()!=null)
+                            tp.setTin(st.getTin());
+                        else
+                            tp.setTin("N/A");
+
+                        if(st.getVoucherNumber()!=null)
+                            tp.setVoucherNumber(st.getVoucherNumber());
+                        else
+                            tp.setVoucherNumber("N/A");
+
+                        if(st.getName()!=null)
+                            tp.setCompanyName(st.getName());
+                        else
+                            tp.setCompanyName("N/A");
+
+                        tp.setPaymentStatus("Success");
+                        //launch printing procedure
+                        PrintHandler ph=new PrintHandler(context,tp);
+                        String print=ph.transPrint();
+                        if(!print.equalsIgnoreCase("Success")){
+                            Log.e(tag,print);
+                        }
+
+                    }catch (Exception e){
+                        Log.e(tag,e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            };
+            new Thread(runnable).start();
+
+            Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh_main");
+            sendBroadcast(i);
         }
 
         @Override

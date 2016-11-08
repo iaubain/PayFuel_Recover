@@ -83,7 +83,7 @@
                     android:background="@drawable/button_shape_positive"
                     android:onClick="next"
                     android:text="NEXT"
-                    android:textColor="@color/positive"
+                    android:textColor="@drawable/text_button_positive"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 

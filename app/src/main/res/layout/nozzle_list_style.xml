@@ -19,8 +19,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/details"
-            android:layout_toRightOf="@+id/nozzleicon"
-            android:layout_toLeftOf="@+id/buttonHolder"
+            android:layout_toEndOf="@+id/nozzleicon"
+            android:layout_toStartOf="@+id/buttonHolder"
             android:layout_centerVertical="true">
 
             <TextView
@@ -34,7 +34,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
                 android:padding="2dp"
-                android:textColor="#33CC33" />
+                android:textColor="@color/positive" />
             <TextView
                 android:id="@+id/nozzleproduct"
                 android:layout_width="wrap_content"
@@ -69,20 +69,17 @@
             android:layout_centerVertical="true">
 
             <Button
-                android:layout_width="50dp"
-                android:layout_height="30dp"
-                android:layout_marginRight="4dp"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
                 android:textColor="@color/positive"
-                android:text="Ѵ"
-                android:background="@drawable/ic_action_positive"
+                android:background="@drawable/ic_accept_neutral"
                 android:id="@+id/accept" />
 
             <Button
-                android:layout_width="50dp"
-                android:layout_height="30dp"
-                android:textColor="@color/error"
-                android:text="X"
-                android:background="@drawable/ic_action_negative"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
+                android:textColor="@color/positive"
+                android:background="@drawable/ic_deny_neutral"
                 android:id="@+id/refuse" />
         </TableRow>
     </RelativeLayout>

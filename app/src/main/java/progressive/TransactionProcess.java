@@ -99,14 +99,14 @@ public class TransactionProcess implements HandleUrlInterface {
         Log.d(tag,"Getting result from the server");
         try{
             if((object.getClass().getSimpleName().equalsIgnoreCase("TransactionResponse"))&&(object!=null)){
-                TransactionResponse tr=(TransactionResponse) object;
-                final SellingTransaction st=tr.getSellingTransaction();
+                TransactionResponse transactionResponse=(TransactionResponse) object;
+                final SellingTransaction st=transactionResponse.getSellingTransaction();
 
                 //_________Draft______\\
-                if(tr.getStatusCode()==500){
+                if(transactionResponse.getStatusCode() == 500){
                     st.setStatus(500);
                     long dbId=db.updateTransaction(st);
-                }else if(tr.getStatusCode()==100){
+                }else if(transactionResponse.getStatusCode()==100){
                     SellingTransaction stLocal=db.getSingleTransaction(st.getDeviceTransactionId());
 
                     //Increment nozzles' index
@@ -123,6 +123,10 @@ public class TransactionProcess implements HandleUrlInterface {
                             public void run() {
                                 Log.v(tag,"Running a printing thread");
                                 try{
+
+                                    st.setStatus(100);
+                                    db.updateTransaction(st);
+
                                     TransactionPrint tp=new TransactionPrint();
 
                                     tp.setAmount(st.getAmount());
@@ -173,13 +177,11 @@ public class TransactionProcess implements HandleUrlInterface {
                                         }
                                     }else{
                                         //Update the status to generate the the print out finally
-                                        if(st.getStatus()!=500){
-                                            st.setStatus(st.getStatus()+1);
+                                        st.setStatus(st.getStatus());
 
-                                            long dbId=db.updateTransaction(st);
-                                            if(dbId<=0){
-                                                Log.e(tag,"Failed to generate receipt");
-                                            }
+                                        long dbId=db.updateTransaction(st);
+                                        if(dbId<=0){
+                                            Log.e(tag,"Failed to generate receipt");
                                         }
                                     }
 
@@ -247,7 +249,7 @@ public class TransactionProcess implements HandleUrlInterface {
         * Transaction Receipt generator: 101(Cash-Success-Receipt) 301(Pending-Receipt) 501(Canceled)
         * */
 
-        PaymentMode pm=db.getSinglePaymentMode(st.getPaymentModeId());
+//        PaymentMode pm=db.getSinglePaymentMode(st.getPaymentModeId());
 
 //        //if payment mode equals cash
 //        if(pm.getName().equalsIgnoreCase("cash") || pm.getName().equalsIgnoreCase("debt") || pm.getName().equalsIgnoreCase("SP CARD")){
@@ -273,8 +275,9 @@ public class TransactionProcess implements HandleUrlInterface {
 //            st=db.getSingleTransaction(st.getDeviceTransactionId());
 //        }
 
+//
+//        st.setStatus(301);
 
-        st.setStatus(301);
         long transactonId=db.createTransaction(st);
         AsyncTransaction at=new AsyncTransaction();
         at.setSum(0);
@@ -282,11 +285,10 @@ public class TransactionProcess implements HandleUrlInterface {
         at.setUserId(st.getUserId());
         at.setBranchId(st.getBranchId());
         at.setDeviceTransactionId(st.getDeviceTransactionId());
-        at.setSum(0);
 
         long asyncDBId=db.createAsyncTransaction(at);
 
-        if(transactionId<=0 || asyncDBId<=0){
+        if(transactionId < 0 || asyncDBId < 0){
                 tfi.feedsMessage(context.getResources().getString(R.string.faillurenotification));
                 return;
             }

@@ -2,7 +2,7 @@
 <resources>
     <color name="rdcolor">#000000</color>
     <color name="rdoff">#969696</color>
-    <color name="appcolor">#0d790c</color>
+    <color name="appcolor">#042c90</color>
     <color name="transparent">#00000000</color>
     <color name="tab_highlight">#3737f1</color>
     <color name="error">#ff0000</color>
@@ -16,5 +16,7 @@
     <color name="list_row_hover_end_color">#ebeef0</color>
 
     <color name="white">#ffffff</color>
-    <color name="positive">#0d790c</color>
+    <color name="appWhite">#ffffff</color>
+    <color name="positive">#042c90</color>
+    <color name="green">#1a8C35</color>
 </resources>

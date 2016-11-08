@@ -16,7 +16,6 @@ public class MainAppReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
         Log.d(tag,"Broad Cast Message Received");
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)){

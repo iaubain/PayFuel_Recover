@@ -439,8 +439,53 @@ public class DBHelper extends SQLiteOpenHelper {
         List<SellingTransaction> sts = new ArrayList<SellingTransaction>();
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE "+ userId + " = " + user_id+" AND "+time+" >= Datetime('"+sdf.format(calendar.getTime())+"') ORDER BY "+time+" DESC";
 
-        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE "+ userId + " = " + user_id+" AND "+time+" >= Datetime('"+sdf.format(calendar.getTime())+"') ORDER BY "+transactionId+" DESC";
+        Log.e(tag, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            while (c.isAfterLast() == false){
+                SellingTransaction st = new SellingTransaction();
+                st.setDeviceTransactionId(c.getLong(c.getColumnIndex(transactionId)));
+                st.setNozzleId(c.getInt(c.getColumnIndex(nozzleId)));
+                st.setAmount(Double.parseDouble(c.getString(c.getColumnIndex(amount))));
+                st.setQuantity(Double.parseDouble(c.getString(c.getColumnIndex(quantity))));
+                st.setPlateNumber(c.getString(c.getColumnIndex(plateNumber)));
+                st.setTelephone(c.getString(c.getColumnIndex(telephone)));
+                st.setName(c.getString(c.getColumnIndex(customerName)));
+                st.setTin(c.getString(c.getColumnIndex(tin)));
+                st.setVoucherNumber(c.getString(c.getColumnIndex(voucherNumber)));
+                st.setAuthorisationCode(c.getString(c.getColumnIndex(authorisationCode)));
+                st.setDeviceTransactionTime(c.getString(c.getColumnIndex(time)).toString());
+                st.setAuthenticationCode(c.getInt(c.getColumnIndex(authenticationCode)));
+                st.setDeviceNo(c.getString(c.getColumnIndex(deviceId)));
+                st.setStatus(c.getInt(c.getColumnIndex(status)));
+                st.setBranchId(c.getInt(c.getColumnIndex(branchId)));
+                st.setUserId(c.getInt(c.getColumnIndex(userId)));
+                st.setAuthenticationCode(c.getInt(c.getColumnIndex(authenticationCode)));
+                st.setPumpId(c.getInt(c.getColumnIndex(pumpId)));
+                st.setProductId(c.getInt(c.getColumnIndex(productId)));
+                st.setPaymentModeId(c.getInt(c.getColumnIndex(paymentModeId)));
+                // adding transaction to list
+                sts.add(st);
+                c.moveToNext();
+            }
+        }
+
+        return sts;
+    }
+
+
+    public List<SellingTransaction> getAllUnsuccessfulTransaction(long user_id) {
+        List<SellingTransaction> sts = new ArrayList<SellingTransaction>();
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE ("+ userId + " = " + user_id+" AND ("+status+" == 301 OR "+status+" == 302)) AND "+time+" >= Datetime('"+sdf.format(calendar.getTime())+"') ORDER BY "+transactionId+" DESC";
 
         Log.e(tag, selectQuery);
 
@@ -498,7 +543,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.v(tag,"Report date is:"+now);
 
         List<SellingTransaction> sts = new ArrayList<SellingTransaction>();
-        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE "+ userId + " = " + user_id+" AND date("+time+") == '"+now +"' ORDER BY "+time+" DESC";
+        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE ("+ userId + " = " + user_id+" AND date("+time+") == '"+now +"') AND "+status+" = 100 OR "+status+" = 101 ORDER BY "+time+" DESC";
 
         Log.e(tag, selectQuery);
 
@@ -584,7 +629,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String countQuery = "SELECT  * FROM " + transactionTable+ " WHERE " + userId + " = " + String.valueOf(u_id)+" AND "+status+" = 301 OR "+status+" = 302"+" AND "+time+" >= Datetime('"+sdf.format(calendar.getTime())+"')";
+        String countQuery = "SELECT  * FROM " + transactionTable+ " WHERE (" + userId + " = " + String.valueOf(u_id)+" AND "+status+" = 301 OR "+status+" = 302)"+" AND "+time+" >= Datetime('"+sdf.format(calendar.getTime())+"')";
         Cursor cursor = db.rawQuery(countQuery, null);
 
         int count = cursor.getCount();

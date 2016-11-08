@@ -52,7 +52,7 @@
             android:layout_alignParentEnd="true"
             android:id="@+id/print"
             android:text="PRINT"
-            android:textColor="@color/positive"
+            android:textColor="@drawable/text_button_positive"
             android:textStyle="bold"
             android:background="@drawable/ic_action_positive"/>
     </RelativeLayout>

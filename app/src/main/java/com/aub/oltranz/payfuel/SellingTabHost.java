@@ -228,8 +228,16 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
     public void logout(View v){
         Log.v(tag, "Logging out...");
 
-        if (doubleBackToExitPressedOnce) {
-//            DeviceIdentity di=db.getSingleDevice();
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.dialog_message)
+                .setTitle(R.string.dialog_title);
+
+        // Add the buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                // User clicked OK button
+                //            DeviceIdentity di=db.getSingleDevice();
 //            LogoutData ld=new LogoutData();
 //            try {
 //                ld.setDevId(di.getDeviceNo());
@@ -242,44 +250,94 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
 //            }
 
 
-            //unregisterReceiver(broadcastReceiver);
+                //unregisterReceiver(broadcastReceiver);
 
-            Intent logoutIntent=new Intent(this, LogoutService.class);
-            Bundle logotBundle=new Bundle();
-            logotBundle.putInt("userId",userId);
-            DeviceIdentity di=db.getSingleDevice();
-            logotBundle.putString("deviceNo",di.getDeviceNo());
+                Intent logoutIntent=new Intent(getApplicationContext(), LogoutService.class);
+                Bundle logotBundle=new Bundle();
+                logotBundle.putInt("userId",userId);
+                DeviceIdentity di=db.getSingleDevice();
+                logotBundle.putString("deviceNo",di.getDeviceNo());
 
-            logoutIntent.putExtras(logotBundle);
+                logoutIntent.putExtras(logotBundle);
 
-            this.startService(logoutIntent);
+                startService(logoutIntent);
 
 
-            Calendar cal = Calendar.getInstance();
-            Intent alarmIntent = new Intent(context, CheckTransaction.class);
-            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            //clean alarm cache for previous pending intent
-            alarm.cancel(pintent);
+                Calendar cal = Calendar.getInstance();
+                Intent alarmIntent = new Intent(context, CheckTransaction.class);
+                PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+                AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                //clean alarm cache for previous pending intent
+                alarm.cancel(pintent);
 
-            intent=new Intent(this,Home.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            finish();
-            startActivity(intent);
-
-            return;
-        }
-
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click Logout again to exit", Toast.LENGTH_SHORT).show();
-
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
+                intent=new Intent(getApplicationContext(),Home.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                finish();
+                startActivity(intent);
             }
-        }, 2000);
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+//
+//        if (doubleBackToExitPressedOnce) {
+////            DeviceIdentity di=db.getSingleDevice();
+////            LogoutData ld=new LogoutData();
+////            try {
+////                ld.setDevId(di.getDeviceNo());
+////                ld.setUserId(userId);
+////                mc=new MapperClass();
+////
+////                handleUrl=new HandleUrl(this,this,getResources().getString(R.string.logouturl),getResources().getString(R.string.post),mc.mapping(ld));
+////            }catch (Exception e){
+////                uiFeedBack(e.getMessage());
+////            }
+//
+//
+//            //unregisterReceiver(broadcastReceiver);
+//
+//            Intent logoutIntent=new Intent(this, LogoutService.class);
+//            Bundle logotBundle=new Bundle();
+//            logotBundle.putInt("userId",userId);
+//            DeviceIdentity di=db.getSingleDevice();
+//            logotBundle.putString("deviceNo",di.getDeviceNo());
+//
+//            logoutIntent.putExtras(logotBundle);
+//
+//            this.startService(logoutIntent);
+//
+//
+//            Calendar cal = Calendar.getInstance();
+//            Intent alarmIntent = new Intent(context, CheckTransaction.class);
+//            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//            //clean alarm cache for previous pending intent
+//            alarm.cancel(pintent);
+//
+//            intent=new Intent(this,Home.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//            finish();
+//            startActivity(intent);
+//
+//            return;
+//        }
+//
+//        this.doubleBackToExitPressedOnce = true;
+//        Toast.makeText(this, "Please click Logout again to exit", Toast.LENGTH_SHORT).show();
+//
+//        new Handler().postDelayed(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                doubleBackToExitPressedOnce = false;
+//            }
+//        }, 2000);
     }
 
     @Override

@@ -43,23 +43,33 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="4dp"
         android:gravity="center">
+        <LinearLayout
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_marginEnd="50dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:textColor="@drawable/text_button_negative"
+                android:background="@drawable/button_shape_negative"
+                android:text="CANCEL"
+                android:id="@+id/cancel" />
 
-        <Button
-            android:layout_width="145dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:textColor="@color/nearblack"
-            android:background="@drawable/button_shape_negative"
-            android:text="CANCEL"
-            android:id="@+id/cancel" />
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="DONE"
+                android:textColor="@drawable/text_button_positive"
+                android:background="@drawable/button_shape_positive"
+                android:id="@+id/done" />
 
-        <Button
-            android:layout_width="145dp"
-            android:layout_height="wrap_content"
-            android:text="DONE"
-            android:textColor="@color/positive"
-            android:background="@drawable/button_shape_positive"
-            android:id="@+id/done" />
+        </LinearLayout>
 
     </TableRow>
 

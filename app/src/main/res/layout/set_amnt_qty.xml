@@ -134,9 +134,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:padding="8dp"
                 android:layout_gravity="right"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:background="@color/tab_highlight"
+                android:textColor="@drawable/text_link"
                 android:text="Company?"
                 android:id="@+id/what" />
         </LinearLayout>
@@ -150,24 +151,34 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="4dp"
         android:gravity="center">
-        <Button
-            android:layout_width="145dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="2dp"
-            android:background="@drawable/button_shape_negative"
-            android:textColor="@color/nearblack"
-            android:textStyle="bold"
-            android:text="CANCEL"
-            android:id="@+id/cancel" />
 
-        <Button
-            android:layout_width="145dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/positive"
-            android:textStyle="bold"
-            android:background="@drawable/button_shape_positive"
-            android:text="PAY"
-            android:id="@+id/pay" />
+        <LinearLayout
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_marginEnd="50dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:textColor="@drawable/text_button_negative"
+                android:background="@drawable/button_shape_negative"
+                android:text="CANCEL"
+                android:id="@+id/cancel" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textColor="@drawable/text_button_positive"
+                android:background="@drawable/button_shape_positive"
+                android:text="PAY"
+                android:id="@+id/pay"  />
+
+        </LinearLayout>
 
     </TableRow>
 

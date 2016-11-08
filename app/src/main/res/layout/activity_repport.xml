@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".Report"
     android:orientation="vertical">
 
@@ -11,6 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="4dp"
         android:id="@+id/scrollView"
+        android:fillViewport="true"
         android:layout_gravity="center_horizontal" >
 
         <LinearLayout
@@ -18,40 +20,47 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textStyle="bold"
+                android:textColor="@drawable/text_button_positive"
+                android:background="@drawable/button_shape_positive"
+                android:text="SHIFT REPORT"
+                android:onClick="report"
+                android:id="@+id/rep" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textStyle="bold"
+                android:textColor="@drawable/text_button_positive"
+                android:background="@drawable/button_shape_positive"
+                android:text="TRANSACTIONS LOGS"
+                android:onClick="records"
+                android:id="@+id/rec" />
+
             <TableRow
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="wrap_content">
 
-                <Button
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="4dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/positive"
-                    android:background="@drawable/button_shape_positive"
-                    android:text="REPORT"
-                    android:onClick="report"
-                    android:id="@+id/rep" />
+
+
+
 
                 <Button
-                    android:layout_width="120dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dp"
+                    android:padding="4dp"
                     android:textStyle="bold"
-                    android:textColor="@color/positive"
+                    android:textSize="12sp"
+                    android:textColor="@drawable/text_button_positive"
                     android:background="@drawable/button_shape_positive"
-                    android:text="LOGS"
-                    android:onClick="records"
-                    android:id="@+id/rec" />
-
-                <Button
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="4dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/positive"
-                    android:background="@drawable/button_shape_positive"
-                    android:text="SP ADMIN"
+                    android:text="ENGEN ADMIN"
                     android:onClick="admin"
                     android:id="@+id/admin" />
             </TableRow>

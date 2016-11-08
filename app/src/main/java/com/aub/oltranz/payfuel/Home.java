@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -41,8 +42,9 @@ import models.MapperClass;
 public class Home extends ActionBarActivity implements HandleUrlInterface {
     String tag = "PayFuel: " + getClass().getSimpleName();
 
-    TextView tv, regLink, spAdminLink;
+    TextView tv;
     EditText pin;
+    ImageView regLink, admin;
     Button login;
     Context context;
 
@@ -86,8 +88,8 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
         tv = (TextView) findViewById(R.id.tv);
         pin = (EditText) findViewById(R.id.pin);
         login = (Button) findViewById(R.id.login);
-        regLink = (TextView) findViewById(R.id.regLink);
-        spAdminLink = (TextView) findViewById(R.id.spAdminLink);
+        regLink = (ImageView) findViewById(R.id.regLink);
+        admin = (ImageView) findViewById(R.id.adminLink);
         context = this;
     }
 
@@ -159,15 +161,15 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
         startActivity(intent);
     }
 
-    public void spAdmin(View v){
-        Log.d(tag,"SP Admin Triggered");
-        Intent intent = getPackageManager().getLaunchIntentForPackage("com.payfuel.spadmin.spadmin");
+    public void myAdmin(View v){
+        Log.d(tag,"ENGEN Admin Triggered");
+        Intent intent = getPackageManager().getLaunchIntentForPackage("com.olranz.payfuel.myadmin");
         if (intent != null) {
             // We found the activity now start the activity
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } else {
-            uiFeedBack("SP Admin App Is Missing...!");
+            uiFeedBack("ENGEN Admin App Is Missing...!");
 //            // Bring user to the market or let them choose an app?
 //            intent = new Intent(Intent.ACTION_VIEW);
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -179,13 +181,20 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
     //Return a message to the user
     public void uiFeedBack(String message) {
         enableUI();
-        //dismissDialog();
-        if (message != null) {
-            Log.d(tag, "FeedBack to the user: " + message);
-            tv.setText(message);
-        } else {
-            Log.d(tag, "FeedBack to the user");
-            tv.setText(getResources().getString(R.string.nulluifeedback));
+        try{
+            if(!TextUtils.isEmpty(message)){
+                tv.setTextColor(getResources().getColor(R.color.error));
+                tv.setText(message);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setTextColor(getResources().getColor(R.color.darkgray));
+                        tv.setText("ENTER YOUR PIN CODE");
+                    }
+                }, 4000);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -722,6 +731,7 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
 //            title.setText(message);
 //        }
     }
+
 
     //dismiss dialog text
     public void dismissDialog() {

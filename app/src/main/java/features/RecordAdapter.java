@@ -64,7 +64,7 @@ public class RecordAdapter extends ArrayAdapter<SellingTransaction> {
             payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Succeeded");
             payInfo.setTextColor(context.getResources().getColor(R.color.positive));
         }
-        else if(st.getStatus()==301){
+        else if(st.getStatus()==301 || st.getStatus()==302){
             payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Pending");
             payInfo.setTextColor(context.getResources().getColor(R.color.tab_highlight));
 
