@@ -44,8 +44,7 @@ public class NozzleListAdapter extends ArrayAdapter<String> {
     PumpAndNozzleList choosenPumpAndNozzle;
     NozzleDenied nd;
     List<PumpAndNozzle> selectedList;
-
-
+    Typeface font;
 
     public NozzleListAdapter(Activity context,int userId, int pumpId, View pumpView, List<Nozzle> nozzles, List<String> nozzleNameList/*, List<String> imgIdList, List<String> indexList,List<String> productList, List<String> nozzleId*/) {
         super(context, R.layout.nozzle_list_style,nozzleNameList);
@@ -64,6 +63,7 @@ public class NozzleListAdapter extends ArrayAdapter<String> {
         nd=new NozzleDenied();
         choosenPumpAndNozzle=new PumpAndNozzleList();
         selectedList=new ArrayList<PumpAndNozzle>();
+        font=Typeface.createFromAsset(context.getAssets(), "font/ubuntu.ttf");
     }
 
     public View getView(final int position,View view,ViewGroup parent) {
@@ -77,18 +77,29 @@ public class NozzleListAdapter extends ArrayAdapter<String> {
         View rowView=inflater.inflate(R.layout.nozzle_list_style, null, true);
 
         TextView nozzleName = (TextView) rowView.findViewById(R.id.nozzlename);
+        nozzleName.setTypeface(font);
+
         final ImageView nozzleIcon = (ImageView) rowView.findViewById(R.id.nozzleicon);
+
         TextView index = (TextView) rowView.findViewById(R.id.index);
-        index.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        index.setTypeface(font,Typeface.BOLD);
 
         TextView product = (TextView) rowView.findViewById(R.id.nozzleproduct);
+        product.setTypeface(font);
+
         final TextView label = (TextView) rowView.findViewById(R.id.nozzleindicator);
+        label.setTypeface(font);
 
         final TextView pumpLabel=(TextView) pumpView.findViewById(R.id.indicator);
+        pumpLabel.setTypeface(font);
+
         final ImageView pumpImg=(ImageView) pumpView.findViewById(R.id.icon);
 
         final Button refuse=(Button) rowView.findViewById(R.id.refuse);
+        refuse.setTypeface(font);
+
         final Button accept=(Button) rowView.findViewById(R.id.accept);
+        accept.setTypeface(font);
 
         final Nozzle nozzle=nozzles.get(position);
         final boolean[] refuseCheck = {false},acceptCheck={false};

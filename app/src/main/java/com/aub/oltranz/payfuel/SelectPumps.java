@@ -1,6 +1,5 @@
 package com.aub.oltranz.payfuel;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
@@ -24,11 +24,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,13 +35,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import appBean.ChoosenPumpResponse;
-import appBean.LogoutResponse;
 import databaseBean.DBHelper;
 import entities.DeviceIdentity;
 import entities.Logged_in_user;
 import entities.Nozzle;
 import entities.Pump;
-import entities.SellingTransaction;
 import entities.WorkStatus;
 import features.CheckTransaction;
 import features.ExpandableListAdapter;
@@ -53,11 +49,9 @@ import features.LogoutService;
 import features.NozzleListAdapter;
 import features.PreferenceManager;
 import features.PumpListAdapter;
-import features.RecordAdapter;
 import features.ServiceCheck;
 import models.ChoosenPumpAndNozzle;
 import models.ChoosenPumps;
-import models.LogoutData;
 import models.MapperClass;
 
 public class SelectPumps extends ActionBarActivity implements AdapterView.OnItemClickListener, HandleUrlInterface {
@@ -86,13 +80,18 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
     Bundle savedBundle;
     StrictMode.ThreadPolicy policy;
     Dialog dialog;
+    Typeface font;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //go full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getSupportActionBar().hide();
+        try{
+            getSupportActionBar().hide();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         setContentView(R.layout.activity_select_pumps);
 
         savedBundle =getIntent().getExtras();
@@ -113,10 +112,13 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
     //initialize app UI
     public void initAppUI(){
         Log.d(tag, "Initializing Activity UI");
+        context=getApplicationContext();
+        font= Typeface.createFromAsset(getAssets(), "font/ubuntu.ttf");
         mList=(ListView) findViewById(R.id.pumlist);
         next =(Button) findViewById(R.id.next);
-        tv=(TextView) findViewById(R.id.tv);
-        context=getApplicationContext();
+        next.setTypeface(font,Typeface.BOLD);
+        tv=(TextView) findViewById(R.id.popupTv);
+        tv.setTypeface(font);
     }
 
     //initialize app components
@@ -260,15 +262,20 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
         dialog.setCanceledOnTouchOutside(false);
 
         int dividerId = dialog.getContext().getResources().getIdentifier("android:id/titleDivider", null, null);
-        if (dividerId != 0) {
-            View divider = dialog.findViewById(dividerId);
-            divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+        try{
+            if (dividerId != 0) {
+                View divider = dialog.findViewById(dividerId);
+                divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
         dialog.setTitle(Html.fromHtml("<font color='" + getResources().getColor(R.color.appcolor) + "'>Nozzle Status</font>"));
         dialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.pump_blue);
 
         nozzleListView =(ListView) dialog.findViewById(R.id.nozzlelist);
         Button finish=(Button) dialog.findViewById(R.id.nozzlefinish);
+        finish.setTypeface(font,Typeface.BOLD);
 
         populateNozzleList(pumpId, pumpView);
 
@@ -303,7 +310,9 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
                 }
                 ImageView pumpImg = (ImageView) pumpView.findViewById(R.id.icon);
                 TextView pumpLabel = (TextView) pumpView.findViewById(R.id.indicator);
+                pumpLabel.setTypeface(font);
                 TextView pumpName = (TextView) pumpView.findViewById(R.id.pumpname);
+                pumpName.setTypeface(font);
                 if (nozzleDenialCheck > 0) {
                     pumpImg.setImageResource(R.drawable.pump_red);
                     pumpLabel.setText("Rejected");
@@ -397,15 +406,23 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
             dialog.setCanceledOnTouchOutside(false);
 
             int dividerId = dialog.getContext().getResources().getIdentifier("android:id/titleDivider", null, null);
-            if (dividerId != 0) {
-                View divider = dialog.findViewById(dividerId);
-                divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+            try{
+                if (dividerId != 0) {
+                    View divider = dialog.findViewById(dividerId);
+                    divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+                }
+            }catch (NullPointerException e){
+                e.printStackTrace();
             }
             dialog.setTitle(Html.fromHtml("<font color='"+getResources().getColor(R.color.appcolor)+"'>Confirm to get Started</font>"));
 
             expListView = (ExpandableListView) dialog.findViewById(R.id.lvExp);
+
             Button done=(Button) dialog.findViewById(R.id.done);
+            done.setTypeface(font, Typeface.BOLD);
+
             Button back=(Button) dialog.findViewById(R.id.back);
+            back.setTypeface(font, Typeface.BOLD);
 
             List<WorkStatus> statuses=new ArrayList<WorkStatus>();
             List<String> pNames=new ArrayList<String>();

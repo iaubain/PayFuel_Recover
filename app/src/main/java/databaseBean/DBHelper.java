@@ -7,10 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import entities.AsyncTransaction;
 import entities.DeviceIdentity;
@@ -340,7 +342,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if(st.getStatus()!= 0)
             values.put(status,st.getStatus());
         else
-            values.put(status,0);
+            values.put(status,500);
         //use the default in the database
        // values.put(time,st.getDeviceTransactionTime());
 
@@ -438,8 +440,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public List<SellingTransaction> getAllTransactionsPerUser(long user_id) {
         List<SellingTransaction> sts = new ArrayList<SellingTransaction>();
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE "+ userId + " = " + user_id+" AND "+time+" >= Datetime('"+sdf.format(calendar.getTime())+"') ORDER BY "+time+" DESC";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// Datetime('"+sdf.format(calendar.getTime())+"')
+        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE "+ userId + " = " + user_id+" AND date("+time+") >= date('now', '-1 days') ORDER BY "+time+" DESC";
 
         Log.e(tag, selectQuery);
 
@@ -528,7 +530,9 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * getting all Transactions based on time per user
      */
-    public List<SellingTransaction> getAllTransactionsPerTime(long user_id) {
+    public List<SellingTransaction> getAllTransactionsPerTime(long user_id, int reportDate) {
+        String selectQuery = null;
+
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH)+1;
@@ -543,8 +547,18 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.v(tag,"Report date is:"+now);
 
         List<SellingTransaction> sts = new ArrayList<SellingTransaction>();
-        String selectQuery = "SELECT  * FROM " + transactionTable + " WHERE ("+ userId + " = " + user_id+" AND date("+time+") == '"+now +"') AND "+status+" = 100 OR "+status+" = 101 ORDER BY "+time+" DESC";
+        if(reportDate == 0){
+//            selectQuery = "SELECT  * FROM " + transactionTable + " WHERE ("+ userId + " = " + user_id+" AND date("+time+") == '"+now +"') AND "+status+" = 100 OR "+status+" = 101 ORDER BY "+time+" DESC";
+            selectQuery = "SELECT * FROM "+transactionTable+" WHERE ("+userId+" = "+user_id+" AND date("+time+") == date('now')) AND "+status+" = 100 OR "+status+" = 101 ORDER BY "+time+" DESC";
 
+        }
+
+        if(reportDate == -1){
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -1);//'"+dateFormat.format(cal.getTime())+"'
+            selectQuery = "SELECT * FROM "+transactionTable+" WHERE ("+userId+" = "+user_id+" AND date("+time+") == date('now', '-1 days')) AND "+status+" = 100 OR "+status+" = 101 ORDER BY "+time+" DESC";
+        }
         Log.e(tag, selectQuery);
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -591,6 +605,15 @@ public class DBHelper extends SQLiteOpenHelper {
     public void deleteTransaction(long t_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(transactionTable, transactionId + " = ?", new String[]{String.valueOf(t_id)});
+    }
+
+    /**
+     * Deleting old Transactions
+     */
+    public void deleteOldTransaction() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "DELETE FROM "+transactionTable+" WHERE "+time+" <= date('now','-6 day')";
+        db.execSQL(sql);
     }
 
     /**

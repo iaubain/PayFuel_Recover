@@ -11,140 +11,123 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="12sp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:textColor="@color/darkgray"
         android:text="Monitor"
-        android:id="@+id/tv"
+        android:id="@+id/popupTv"
         android:layout_gravity="center_horizontal"/>
 
-    <TableRow
+    <LinearLayout
+        android:id="@+id/mainValue"
+        android:layout_below="@+id/popupTv"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/tv"
-        android:layout_marginBottom="52dp"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:layout_centerVertical="true">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/appcolor"
+            android:text="Enter amount (RWF)"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/edit_text_shape"
+            android:id="@+id/amnt"
+            android:textSize="23dp"
+            android:inputType="phone"
+            android:hint="Fill the Amount"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/appcolor"
+            android:text="Enter quantity (LITERS)"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/edit_text_shape"
+            android:gravity="center"
+            android:id="@+id/qty"
+            android:textSize="15dp"
+            android:inputType="phone"
+            android:hint="Fill the Quantity"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TableRow
-                android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/mainValue"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_marginBottom="10dp"
+            android:layout_above="@+id/bottomBlock">
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_gravity="center"
-                android:gravity="center">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:gravity="center">
-                        <EditText
-                            android:layout_width="145dp"
-                            android:layout_height="75dp"
-                            android:layout_marginRight="2dp"
-                            android:gravity="center"
-                            android:background="@drawable/edit_text_shape"
-                            android:id="@+id/amnt"
-                            android:textSize="20dp"
-                            android:inputType="phone"
-                            android:hint="Fill the Amount"
-                            android:layout_gravity="center_horizontal" />
-
-                        <EditText
-                            android:layout_width="145dp"
-                            android:layout_height="75dp"
-                            android:background="@drawable/edit_text_shape"
-                            android:gravity="center"
-                            android:id="@+id/qty"
-                            android:textSize="20dp"
-                            android:inputType="phone"
-                            android:hint="Fill the Quantity"
-                            android:layout_gravity="center_horizontal" />
-                    </TableRow>
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
-                        android:gravity="center">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Amount"
-                            android:textColor="@color/appcolor"/>
-                        <TextView
-                            android:layout_width="100dp"
-                            android:layout_height="wrap_content"
-                            android:text=""/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Quantity"
-                            android:textColor="@color/appcolor"/>
-
-                    </TableRow>
-                </RelativeLayout>
-
-            </TableRow>
+                android:layout_marginTop="8dp"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:layout_gravity="right"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@drawable/text_link"
+                android:text="Click here to more info if available!"
+                android:id="@+id/what" />
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:maxLines="1"
                 android:id="@+id/platenumber"
-                android:background="@drawable/border_normal"
-                android:gravity="center"
+                android:visibility="gone"
+                android:background="@drawable/edit_text_shape"                android:gravity="center"
                 android:textAllCaps="true"
-                android:textSize="20dp"
+                android:textSize="15dp"
                 android:hint="Fill the Plate Number"
                 android:layout_gravity="center_horizontal" />
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:maxLines="1"
                 android:layout_marginTop="4dp"
-                android:background="@drawable/border_normal"
-                android:gravity="center"
+                android:background="@drawable/edit_text_shape"                android:gravity="center"
                 android:id="@+id/tin"
-                android:textSize="20dp"
+                android:textSize="15dp"
                 android:hint="Fill the TIN Number"
                 android:visibility="gone"
                 android:layout_gravity="center_horizontal" />
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:maxLines="1"
                 android:layout_marginTop="4dp"
-                android:background="@drawable/border_normal"
-                android:gravity="center"
+                android:background="@drawable/edit_text_shape"                android:gravity="center"
                 android:id="@+id/name"
-                android:textSize="20dp"
+                android:textSize="15dp"
                 android:hint="Fill the Company Name"
                 android:visibility="gone"
                 android:layout_gravity="center_horizontal" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:layout_gravity="right"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@drawable/text_link"
-                android:text="Company?"
-                android:id="@+id/what" />
         </LinearLayout>
 
-    </TableRow>
-
     <TableRow
+        android:id="@+id/bottomBlock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -62,6 +63,7 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
     ThreadControl tc;
     Dialog progress;
     ProgressDialog progressBar;
+    Typeface font;
 
     int userId, branchId;
 
@@ -70,7 +72,11 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
         super.onCreate(savedInstanceState);
         //go full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getSupportActionBar().hide();
+        try {
+            getSupportActionBar().hide();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         setContentView(R.layout.activity_home);
 
         //initialize activity UI
@@ -85,12 +91,20 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
     //initialize app UI
     public void initAppUI() {
         Log.d(tag, "Initializing app UI");
-        tv = (TextView) findViewById(R.id.tv);
+        context = this;
+        font=Typeface.createFromAsset(getAssets(), "font/ubuntu.ttf");
+
+        tv = (TextView) findViewById(R.id.popupTv);
+        tv.setTypeface(font);
+
         pin = (EditText) findViewById(R.id.pin);
+        pin.setTypeface(font);
+
         login = (Button) findViewById(R.id.login);
+        login.setTypeface(font, Typeface.BOLD);
+
         regLink = (ImageView) findViewById(R.id.regLink);
         admin = (ImageView) findViewById(R.id.adminLink);
-        context = this;
     }
 
     //initialize app components

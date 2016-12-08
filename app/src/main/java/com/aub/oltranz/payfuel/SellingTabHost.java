@@ -22,12 +22,17 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import appBean.LogoutResponse;
 import databaseBean.DBHelper;
+import entities.AsyncTransaction;
 import entities.DeviceIdentity;
 import entities.Logged_in_user;
+import entities.PaymentMode;
+import entities.SellingTransaction;
 import features.CheckTransaction;
 import features.HandleUrl;
 import features.HandleUrlInterface;
@@ -35,6 +40,7 @@ import features.LogoutService;
 import features.PreferenceManager;
 import models.LogoutData;
 import models.MapperClass;
+import modules.ClearPending;
 
 public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeListener, HandleUrlInterface {
     String tag="PayFuel: "+getClass().getSimpleName();
@@ -56,6 +62,7 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
     StrictMode.ThreadPolicy policy;
     IntentFilter intentFilterilter;
     BroadcastReceiver broadcastReceiver;
+    int numOfPendingTransaction;
 
     boolean sync=false;
 
@@ -64,7 +71,11 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
         super.onCreate(savedInstanceState);
         //go full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getActionBar().hide();
+        try {
+            getActionBar().hide();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         setContentView(R.layout.activity_selling_tab_host);
 
@@ -79,14 +90,14 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
         PreferenceManager prefs=new PreferenceManager(this);
         prefs.createPreference(userId);
 
-        Calendar calCheck = Calendar.getInstance();
-        Intent alarmIntentCheck = new Intent(context, CheckTransaction.class);
-        PendingIntent pintentCheck = PendingIntent.getService(context, 0, alarmIntentCheck, 0);
-        AlarmManager alarmCheck = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        //clean alarm cache for previous pending intent
-        alarmCheck.cancel(pintentCheck);
-        // schedule for every 5 min 5 * 60 * 1000
-        alarmCheck.setInexactRepeating(AlarmManager.RTC_WAKEUP, calCheck.getTimeInMillis(), 5 * 60 * 1000, pintentCheck);
+//        Calendar calCheck = Calendar.getInstance();
+//        Intent alarmIntentCheck = new Intent(context, CheckTransaction.class);
+//        PendingIntent pintentCheck = PendingIntent.getService(context, 0, alarmIntentCheck, 0);
+//        AlarmManager alarmCheck = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//        //clean alarm cache for previous pending intent
+//        alarmCheck.cancel(pintentCheck);
+//        // schedule for every 5 min 5 * 60 * 1000
+//        alarmCheck.setInexactRepeating(AlarmManager.RTC_WAKEUP, calCheck.getTimeInMillis(), 5 * 60 * 1000, pintentCheck);
 
         try {
 
@@ -226,6 +237,14 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
     }
 
     public void logout(View v){
+        if(!hasPendingTransactions())
+            uiPopLogOut();
+        else{
+            uiPopUp("There still "+numOfPendingTransaction+" transaction(s) on queue, please wait until are uploaded");
+        }
+    }
+
+    private void uiPopLogOut(){
         Log.v(tag, "Logging out...");
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -263,12 +282,12 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
                 startService(logoutIntent);
 
 
-                Calendar cal = Calendar.getInstance();
-                Intent alarmIntent = new Intent(context, CheckTransaction.class);
-                PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-                AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                //clean alarm cache for previous pending intent
-                alarm.cancel(pintent);
+//                Calendar cal = Calendar.getInstance();
+//                Intent alarmIntent = new Intent(context, CheckTransaction.class);
+//                PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//                AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//                //clean alarm cache for previous pending intent
+//                alarm.cancel(pintent);
 
                 intent=new Intent(getApplicationContext(),Home.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -338,6 +357,82 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
 //                doubleBackToExitPressedOnce = false;
 //            }
 //        }, 2000);
+    }
+
+    private boolean hasPendingTransactions(){
+        List<SellingTransaction> pendingSellingTransaction=db.getAllUnsuccessfulTransaction(userId);
+        if(!pendingSellingTransaction.isEmpty()){
+            for(SellingTransaction sellingTransaction : pendingSellingTransaction){
+                AsyncTransaction asyncTransaction = db.getSingleAsyncPerTransacton(sellingTransaction.getDeviceTransactionId());
+                if(asyncTransaction == null){
+                    try{
+                        AsyncTransaction at=new AsyncTransaction();
+                        at.setSum(0);
+                        at.setDeviceId(sellingTransaction.getDeviceNo());
+                        at.setUserId(sellingTransaction.getUserId());
+                        at.setBranchId(sellingTransaction.getBranchId());
+                        at.setDeviceTransactionId(sellingTransaction.getDeviceTransactionId());
+
+                        long asyncDBId=db.createAsyncTransaction(at);
+                    }catch (Exception e){e.printStackTrace();}
+                }
+            }
+        }
+        List<AsyncTransaction> asyncTransactionList=db.getAllAsyncTransactions(userId);
+        try{
+            numOfPendingTransaction = asyncTransactionList.size();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return !asyncTransactionList.isEmpty();
+    }
+
+    private void uiPopUp(String message){
+        try {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(message)
+                    .setTitle(R.string.dialog_title);
+            // Add the buttons
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+
+                    try{
+                        List<AsyncTransaction> asyncTransactionsTemp = new ArrayList<AsyncTransaction>();
+                        List<AsyncTransaction> asyncTransactionList = db.getAllAsyncTransactions(userId);
+                        for(AsyncTransaction asyncTransaction : asyncTransactionList){
+                            SellingTransaction sellingTransaction = db.getSingleTransaction(asyncTransaction.getDeviceTransactionId());
+                            PaymentMode paymentMode = db.getSinglePaymentMode(sellingTransaction.getPaymentModeId());
+
+                            if(paymentMode.getName().toLowerCase().contains("tigo") || paymentMode.getName().toLowerCase().contains("mtn") || paymentMode.getName().toLowerCase().contains("airtel")){
+                                if(asyncTransaction.getSum() <= 40){
+                                    db.deleteAsyncTransaction(asyncTransaction.getDeviceTransactionId());
+                                    if(sellingTransaction.getStatus() != 100){
+                                        sellingTransaction.setStatus(500);
+                                        db.updateTransaction(sellingTransaction);
+                                    }
+                                }else
+                                    asyncTransactionsTemp.add(asyncTransaction);
+                            }else
+                                asyncTransactionsTemp.add(asyncTransaction);
+                        }
+                        if(!asyncTransactionsTemp.isEmpty()){
+                            ClearPending clearPending = new ClearPending(SellingTabHost.this, db.getAllAsyncTransactions(userId), db);
+                            clearPending.startClearing();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

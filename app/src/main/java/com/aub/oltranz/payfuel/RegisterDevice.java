@@ -2,17 +2,20 @@ package com.aub.oltranz.payfuel;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import appBean.DeviceRegistrationResponse;
@@ -37,7 +40,7 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
     DBHelper db;
     MapperClass mapper;
     HandleUrl hu;
-
+    Typeface font;
     Intent intent;
 
     @Override
@@ -45,7 +48,12 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
         super.onCreate(savedInstanceState);
         //go full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getSupportActionBar().hide();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        try {
+            getSupportActionBar().hide();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         setContentView(R.layout.activity_register_device);
         Log.d(tag,"DeviceRegistration Activity Created");
         //initialize UI
@@ -57,14 +65,40 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
     //Initialise Activity UI
     public void initActUI(){
         Log.d(tag,"Initialize Activity UI");
-        tv=(TextView) findViewById(R.id.tv);
+        context=getApplicationContext();
+        font=Typeface.createFromAsset(getAssets(), "font/ubuntu.ttf");
+        //labels
+        TextView lblMail, lblPw, lblDevNm, lblDevNmRe;
+        Button reg;
+
+        reg=(Button) findViewById(R.id.devreg);
+        reg.setTypeface(font, Typeface.BOLD);
+
+        lblMail=(TextView) findViewById(R.id.lblUserName);
+        lblMail.setTypeface(font);
+
+        lblPw=(TextView) findViewById(R.id.lblPassword);
+        lblPw.setTypeface(font);
+
+        lblDevNm=(TextView) findViewById(R.id.lbldevice);
+        lblDevNm.setTypeface(font);
+
+        lblDevNmRe=(TextView) findViewById(R.id.lbldeviceretype);
+        lblDevNmRe.setTypeface(font);
+
+        tv=(TextView) findViewById(R.id.popupTv);
+        tv.setTypeface(font);
         loginLink=(ImageView) findViewById(R.id.loginLink);
         admin =(ImageView) findViewById(R.id.adminLink);
         userName=(EditText) findViewById(R.id.username);
+        userName.requestFocus();
+        userName.setTypeface(font);
         password=(EditText) findViewById(R.id.pw);
+        password.setTypeface(font);
         devName=(EditText) findViewById(R.id.devname);
+        devName.setTypeface(font);
         reDevName=(EditText) findViewById(R.id.retypedevname);
-        context=getApplicationContext();
+        reDevName.setTypeface(font);
     }
 
     //initialize Activity components
@@ -127,15 +161,21 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
     }
     //Return a message to the user
     public void uiFeedBack(String message){
-        //ReEnabling UI
         enableUI();
-
-        if(message!=null) {
-            Log.d(tag, "FeedBack to the user: " + message);
-            tv.setText(message);
-        }else{
-            Log.d(tag, "FeedBack to the user");
-            tv.setText(getResources().getString(R.string.nulluifeedback));
+        try{
+            if(!TextUtils.isEmpty(message)){
+                tv.setTextColor(getResources().getColor(R.color.error));
+                tv.setText(message);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setTextColor(getResources().getColor(R.color.rdcolor));
+                        tv.setText("Register Your Device");
+                    }
+                }, 4000);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -181,7 +221,7 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
     //Disabling all UI element
     public void disableUI(){
         Log.d(tag,"Disable all UI Elements");
-        LinearLayout layout = (LinearLayout) findViewById(R.id.reglayout);
+        ScrollView layout = (ScrollView) findViewById(R.id.reglayout);
         for (int i = 0; i < layout.getChildCount(); i++) {
             View child = layout.getChildAt(i);
             if(child.isEnabled())
@@ -192,7 +232,7 @@ public class RegisterDevice extends ActionBarActivity implements HandleUrlInterf
     //Enable all UI element
     public void enableUI(){
         Log.d(tag,"Enable all UI Elements");
-        LinearLayout layout = (LinearLayout) findViewById(R.id.reglayout);
+        ScrollView layout = (ScrollView) findViewById(R.id.reglayout);
         for (int i = 0; i < layout.getChildCount(); i++) {
             View child = layout.getChildAt(i);
             if(!child.isEnabled())

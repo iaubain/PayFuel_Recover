@@ -13,13 +13,18 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.aub.oltranz.payfuel.myadmin.SpAdmin;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import databaseBean.DBHelper;
 import entities.Logged_in_user;
@@ -43,6 +48,8 @@ public class Report extends ActionBarActivity {
     Dialog dialog;
 
     DBHelper db;
+    boolean yesterdayReport = false;
+    List<SellingTransaction> sts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +82,7 @@ public class Report extends ActionBarActivity {
             Log.e(tag,"Error Occurred. "+e.getMessage());
             e.printStackTrace();
         }
+        sts=new ArrayList<SellingTransaction>();
     }
 
     public void initAppComponents(){
@@ -101,13 +109,17 @@ public class Report extends ActionBarActivity {
         dialog.setCanceledOnTouchOutside(false);
 
         int dividerId = dialog.getContext().getResources().getIdentifier("android:id/titleDivider", null, null);
-        if (dividerId != 0) {
-            View divider = dialog.findViewById(dividerId);
-            divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+        try{
+            if (dividerId != 0) {
+                View divider = dialog.findViewById(dividerId);
+                divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
         dialog.setTitle(Html.fromHtml("<font color='" + getResources().getColor(R.color.appcolor) + "'>Transaction Logs</font>"));
 
-        final TextView tv=(TextView) dialog.findViewById(R.id.tv);
+        final TextView tv=(TextView) dialog.findViewById(R.id.popupTv);
         Button exit=(Button) dialog.findViewById(R.id.done);
         final ListView transView=(ListView) dialog.findViewById(R.id.records);
 
@@ -173,145 +185,305 @@ public class Report extends ActionBarActivity {
         dialog.setCanceledOnTouchOutside(false);
 
         int dividerId = dialog.getContext().getResources().getIdentifier("android:id/titleDivider", null, null);
-        if (dividerId != 0) {
-            View divider = dialog.findViewById(dividerId);
-            divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+        try{
+            if (dividerId != 0) {
+                View divider = dialog.findViewById(dividerId);
+                divider.setBackgroundColor(getResources().getColor(R.color.appcolor));
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
         dialog.setTitle(Html.fromHtml("<font color='" + getResources().getColor(R.color.appcolor) + "'>Transaction Report</font>"));
 
-        final TextView preview=(TextView) dialog.findViewById(R.id.data);
-        final TextView tv=(TextView) dialog.findViewById(R.id.tv);
-        Button exit=(Button) dialog.findViewById(R.id.exit);
-        Button print=(Button) dialog.findViewById(R.id.print);
-
-        exit.setOnClickListener(new View.OnClickListener() {
+//        final TextView preview=(TextView) dialog.findViewById(R.id.data);
+//        final TextView tv=(TextView) dialog.findViewById(R.id.tv);
+//        Button exit=(Button) dialog.findViewById(R.id.exit);
+//        Button print=(Button) dialog.findViewById(R.id.print);
+        RadioGroup mGroup=(RadioGroup) dialog.findViewById(R.id.mGroup);
+        mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                dialog.dismiss();
+            public void onCheckedChanged(RadioGroup radioGroup, int id) {
+                if(id == R.id.yesterday){
+                    yesterdayReport = true;
+                    sts= db.getAllTransactionsPerTime(userId, -1);
+                    showReport(dialog, -1, sts);
+                }
+                if(id == R.id.today){
+                    yesterdayReport = false;
+                    sts= db.getAllTransactionsPerTime(userId, 0);
+                    showReport(dialog, 0, sts);
+                }
             }
         });
 
-        print.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.v(tag,"Running a printing thread");
-                        try{
+//        exit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        print.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.v(tag,"Running a printing thread");
+//                        try{
+//
+//                            PrintReport pr=new PrintReport(context,db.getSingleUser(userId).getBranch_name(),preview.getText().toString());
+//                            String print=pr.reportPrint();
+//                            if(!print.equalsIgnoreCase("Success")){
+//                                tv.setText(print);
+//                            }
+//
+//                        }catch (Exception e){
+//                            tv.setText("Error Occured");
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                };
+//                new Thread(runnable).start();
+//
+//            }
+//        });
+//
+//        try{
+//            preview.setText("Total Transactions: " + db.getTransactionCount(userId) + " Successful: " + db.getTransactionCountSucceeded(userId) + " Pending: " + db.getTransactionCountPending(userId) + " Cancelled: " + db.getTransactionCountCancelled(userId));
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            preview.setText(e.getMessage());
+//        }
+//
+//        HashMap<String, Double> nozzleData = new HashMap<String, Double>();
+//        HashMap<String, Double> paymentData = new HashMap<String, Double>();
+//        HashMap<String, Double> productData = new HashMap<String, Double>();
+//        Double bigSum= Double.valueOf(0);
+//
+//        if(sts.isEmpty()){
+//            preview.setText("No Data Yet");
+//            print.setClickable(false);
+//        }else{
+//
+//            for(SellingTransaction st: sts){
+//                double tempQty;
+//                double tempAmnt;
+//                double tempProd;
+//
+//                Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
+//                String nozzleName=nozzle.getNozzleName();
+//
+//                String productName=nozzle.getProductName();
+//
+//                PaymentMode pm=db.getSinglePaymentMode(st.getPaymentModeId());
+//                String paymentName=pm.getName();
+//
+//                //Nozzles and their sales quantity
+//                if(nozzleData.containsKey(nozzleName)) {
+//                    tempQty = nozzleData.get(nozzleName)+st.getQuantity();
+//                    nozzleData.put(nozzleName,tempQty);
+//                }
+//                else {
+//                    nozzleData.put(nozzleName, st.getQuantity());
+//                }
+//
+//                //Product and their sales quantity
+//                if(productData.containsKey(productName)) {
+//                    tempProd = productData.get(productName)+st.getQuantity();
+//                    productData.put(productName,tempProd);
+//                }
+//                else {
+//                    productData.put(productName, st.getQuantity());
+//                }
+//
+//                //Payment mode and their sales Amount
+//                if(paymentData.containsKey(paymentName)) {
+//                    tempAmnt = paymentData.get(paymentName)+st.getAmount();
+//                    paymentData.put(paymentName,tempAmnt);
+//                }
+//                else {
+//                    paymentData.put(paymentName, st.getAmount());
+//                }
+//                bigSum+=st.getAmount();
+//            }
+//
+//            //Displays data on TextView tv monitor
+//            preview.setText("User: "+db.getSingleUser(userId).getName() + "\n\n");
+//            for (HashMap.Entry<String, Double> nData : nozzleData.entrySet()) {
+//                preview.append(nData.getKey() + ": " + nData.getValue() + " Liters\n");
+//            }
+//            preview.append("\n");
+//
+//            for (HashMap.Entry<String, Double> pData : productData.entrySet()) {
+//                preview.append(pData.getKey() + ": " + pData.getValue() + " Liters\n");
+//            }
+//            preview.append("\n");
+//
+//            for (HashMap.Entry<String, Double> payData : paymentData.entrySet()) {
+//                preview.append(payData.getKey() + ": " + payData.getValue() + " Rwf\n");
+//            }
+//            preview.append("\n");
+//            preview.append("Total Income:" + bigSum + " Rwf\n\n");
+//            final Calendar calendar = Calendar.getInstance();
+//            int year = calendar.get(Calendar.YEAR);
+//            int month = calendar.get(Calendar.MONTH)+1;
+//            int day = calendar.get(Calendar.DAY_OF_MONTH);
+//            String now=year+"-"+month+"-"+day;
+//            if(month<10)
+//                now=year+"-0"+month+"-"+day;
+//
+//            if(day<10)
+//                now=year+"-"+month+"-0"+day;
+//
+//            preview.append(now + "\n");
+//            preview.append("Signature \n");
+//        }
 
-                            PrintReport pr=new PrintReport(context,db.getSingleUser(userId).getBranch_name(),preview.getText().toString());
-                            String print=pr.reportPrint();
-                            if(!print.equalsIgnoreCase("Success")){
-                                tv.setText(print);
-                            }
+        dialog.show();
+    }
 
-                        }catch (Exception e){
-                            tv.setText("Error Occured");
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                new Thread(runnable).start();
+private void showReport(final Dialog dialog, int repportDate, List<SellingTransaction> sts){
+    final TextView preview=(TextView) dialog.findViewById(R.id.data);
+    final TextView tv=(TextView) dialog.findViewById(R.id.popupTv);
+    Button exit=(Button) dialog.findViewById(R.id.exit);
+    Button print=(Button) dialog.findViewById(R.id.print);
 
-            }
-        });
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+    Calendar cal = Calendar.getInstance();
 
-        try{
-            preview.setText("Total Transactions: " + db.getTransactionCount(userId) + " Successful: " + db.getTransactionCountSucceeded(userId) + " Pending: " + db.getTransactionCountPending(userId) + " Cancelled: " + db.getTransactionCountCancelled(userId));
-        }catch (Exception e){
-            e.printStackTrace();
-            preview.setText(e.getMessage());
+    exit.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            dialog.dismiss();
         }
-        List<SellingTransaction> sts= db.getAllTransactionsPerTime(userId);
-        HashMap<String, Double> nozzleData = new HashMap<String, Double>();
-        HashMap<String, Double> paymentData = new HashMap<String, Double>();
-        HashMap<String, Double> productData = new HashMap<String, Double>();
-        Double bigSum= Double.valueOf(0);
+    });
 
-        if(sts.isEmpty()){
-            preview.setText("No Data Yet");
-            print.setClickable(false);
+    print.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    Log.v(tag,"Running a printing thread");
+                    try{
+
+                        PrintReport pr=new PrintReport(context,db.getSingleUser(userId).getBranch_name(),preview.getText().toString());
+                        String print=pr.reportPrint();
+                        if(!print.equalsIgnoreCase("Success")){
+                            tv.setText(print);
+                        }
+
+                    }catch (Exception e){
+                        tv.setText("Error Occured");
+                        e.printStackTrace();
+                    }
+                }
+            };
+            new Thread(runnable).start();
+
+        }
+    });
+
+    try{
+        preview.setText("Total Transactions: " + db.getTransactionCount(userId) + " Successful: " + db.getTransactionCountSucceeded(userId) + " Pending: " + db.getTransactionCountPending(userId) + " Cancelled: " + db.getTransactionCountCancelled(userId));
+    }catch (Exception e){
+        e.printStackTrace();
+        preview.setText(e.getMessage());
+    }
+
+    HashMap<String, Double> nozzleData = new HashMap<String, Double>();
+    HashMap<String, Double> paymentData = new HashMap<String, Double>();
+    HashMap<String, Double> productData = new HashMap<String, Double>();
+    Double bigSum= Double.valueOf(0);
+
+    if(sts.isEmpty()){
+        preview.setText("No Data Yet");
+        print.setClickable(false);
+    }else{
+
+        for(SellingTransaction st: sts){
+            double tempQty;
+            double tempAmnt;
+            double tempProd;
+
+            Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
+            String nozzleName=nozzle.getNozzleName();
+
+            String productName=nozzle.getProductName();
+
+            PaymentMode pm=db.getSinglePaymentMode(st.getPaymentModeId());
+            String paymentName=pm.getName();
+
+            //Nozzles and their sales quantity
+            if(nozzleData.containsKey(nozzleName)) {
+                tempQty = nozzleData.get(nozzleName)+st.getQuantity();
+                nozzleData.put(nozzleName,tempQty);
+            }
+            else {
+                nozzleData.put(nozzleName, st.getQuantity());
+            }
+
+            //Product and their sales quantity
+            if(productData.containsKey(productName)) {
+                tempProd = productData.get(productName)+st.getQuantity();
+                productData.put(productName,tempProd);
+            }
+            else {
+                productData.put(productName, st.getQuantity());
+            }
+
+            //Payment mode and their sales Amount
+            if(paymentData.containsKey(paymentName)) {
+                tempAmnt = paymentData.get(paymentName)+st.getAmount();
+                paymentData.put(paymentName,tempAmnt);
+            }
+            else {
+                paymentData.put(paymentName, st.getAmount());
+            }
+            bigSum+=st.getAmount();
+        }
+
+        //Displays data on TextView tv monitor
+        preview.setText("User: "+db.getSingleUser(userId).getName() + "\n\n");
+        for (HashMap.Entry<String, Double> nData : nozzleData.entrySet()) {
+            preview.append(nData.getKey() + ": " + nData.getValue() + " Liters\n");
+        }
+        preview.append("\n");
+
+        for (HashMap.Entry<String, Double> pData : productData.entrySet()) {
+            preview.append(pData.getKey() + ": " + pData.getValue() + " Liters\n");
+        }
+        preview.append("\n");
+
+        for (HashMap.Entry<String, Double> payData : paymentData.entrySet()) {
+            preview.append(payData.getKey() + ": " + payData.getValue() + " Rwf\n");
+        }
+        preview.append("\n");
+        preview.append("Total Income:" + bigSum + " Rwf\n\n");
+        String now = null;
+        if(repportDate == -1){
+            cal.add(Calendar.DATE, -1);
+            now=dateFormat.format(cal.getTime());
+        } else if(repportDate == 0){
+            now=dateFormat.format(cal.getTime());
         }else{
-
-            for(SellingTransaction st: sts){
-                double tempQty;
-                double tempAmnt;
-                double tempProd;
-
-                Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
-                String nozzleName=nozzle.getNozzleName();
-
-                String productName=nozzle.getProductName();
-
-                PaymentMode pm=db.getSinglePaymentMode(st.getPaymentModeId());
-                String paymentName=pm.getName();
-
-                //Nozzles and their sales quantity
-                if(nozzleData.containsKey(nozzleName)) {
-                    tempQty = nozzleData.get(nozzleName)+st.getQuantity();
-                    nozzleData.put(nozzleName,tempQty);
-                }
-                else {
-                    nozzleData.put(nozzleName, st.getQuantity());
-                }
-
-                //Product and their sales quantity
-                if(productData.containsKey(productName)) {
-                    tempProd = productData.get(productName)+st.getQuantity();
-                    productData.put(productName,tempProd);
-                }
-                else {
-                    productData.put(productName, st.getQuantity());
-                }
-
-                //Payment mode and their sales Amount
-                if(paymentData.containsKey(paymentName)) {
-                    tempAmnt = paymentData.get(paymentName)+st.getAmount();
-                    paymentData.put(paymentName,tempAmnt);
-                }
-                else {
-                    paymentData.put(paymentName, st.getAmount());
-                }
-                bigSum+=st.getAmount();
-            }
-
-            //Displays data on TextView tv monitor
-            preview.setText("User: "+db.getSingleUser(userId).getName() + "\n\n");
-            for (HashMap.Entry<String, Double> nData : nozzleData.entrySet()) {
-                preview.append(nData.getKey() + ": " + nData.getValue() + " Liters\n");
-            }
-            preview.append("\n");
-
-            for (HashMap.Entry<String, Double> pData : productData.entrySet()) {
-                preview.append(pData.getKey() + ": " + pData.getValue() + " Liters\n");
-            }
-            preview.append("\n");
-
-            for (HashMap.Entry<String, Double> payData : paymentData.entrySet()) {
-                preview.append(payData.getKey() + ": " + payData.getValue() + " Rwf\n");
-            }
-            preview.append("\n");
-            preview.append("Total Income:" + bigSum + " Rwf\n\n");
             final Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH)+1;
             int day = calendar.get(Calendar.DAY_OF_MONTH);
-            String now=year+"-"+month+"-"+day;
+            now=year+"-"+month+"-"+day;
             if(month<10)
                 now=year+"-0"+month+"-"+day;
 
             if(day<10)
                 now=year+"-"+month+"-0"+day;
-
-            preview.append(now + "\n");
-            preview.append("Signature \n");
         }
 
-        dialog.show();
+        preview.append(now + "\n");
+        preview.append("Signature \n");
     }
-
-
+}
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ( keyCode == KeyEvent.KEYCODE_MENU ) {

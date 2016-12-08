@@ -31,11 +31,13 @@ import appBean.AsyncResponce;
 import databaseBean.DBHelper;
 import entities.AsyncTransaction;
 import entities.Nozzle;
+import entities.PaymentMode;
 import entities.SellingTransaction;
 import features.PreferenceManager;
 import features.PrintHandler;
 import models.MapperClass;
 import models.TransactionPrint;
+import modules.PostPendingTransactionModule;
 
 public class AppMainService extends Service {
     public static final String myPrefs = "PreferenceManager" ;
@@ -164,27 +166,49 @@ public class AppMainService extends Service {
 
                 stopService();
             }
-            List<SellingTransaction> sellingTransactions=db.getAllUnsuccessfulTransaction(userId);
-        if(!sellingTransactions.isEmpty()){
-            for(SellingTransaction sts: sellingTransactions){
 
-                    AsyncTransaction at=db.getSingleAsyncPerTransacton(sts.getDeviceTransactionId());
-                Log.d(tag,"Async Data \n"+new MapperClass().mapping(at));
-                if(at != null){
-                    if(at.getSum()<=30){
-                        Log.d(tag,"Async Data To Check On Server \n"+new MapperClass().mapping(at));
-                        at.setSum(at.getSum()+1);
-                        db.updateAsyncTransaction(at);
-                        new CheckTrans().execute(new MapperClass().mapping(at));
-                    }else{
-                        Log.d(tag,"Async Data Deleted \n"+new MapperClass().mapping(at));
-                        db.deleteAsyncTransaction(sts.getDeviceTransactionId());
-                        sts.setStatus(500);
-                        db.updateTransaction(sts);
+            List<AsyncTransaction> asyncTransactions= db.getAllAsyncTransactions(userId);
+            if(!asyncTransactions.isEmpty()){
+                for(AsyncTransaction asyncTransaction : asyncTransactions){
+                    Log.d(tag,"Async Data To Check On Server \n"+new MapperClass().mapping(asyncTransaction));
+                    try {
+                        if(asyncTransaction.getSum() <= 40){
+                            asyncTransaction.setSum(asyncTransaction.getSum()+1);
+                            db.updateAsyncTransaction(asyncTransaction);
+                            new CheckTrans().execute(asyncTransaction);
+                        }else{
+                            db.deleteAsyncTransaction(asyncTransaction.getDeviceTransactionId());
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                }else
-                    stopService();
+                }
+            }else{
+                stopService();
             }
+
+//            List<SellingTransaction> sellingTransactions=db.getAllUnsuccessfulTransaction(userId);
+//        if(!sellingTransactions.isEmpty()){
+//            for(SellingTransaction sts: sellingTransactions){
+//
+//                    AsyncTransaction at=db.getSingleAsyncPerTransacton(sts.getDeviceTransactionId());
+//                Log.d(tag,"Async Data \n"+new MapperClass().mapping(at));
+//                if(at != null){
+//                    if(at.getSum()<=30){
+//                        Log.d(tag,"Async Data To Check On Server \n"+new MapperClass().mapping(at));
+//                        at.setSum(at.getSum()+1);
+//                        db.updateAsyncTransaction(at);
+//                        new CheckTrans().execute(new MapperClass().mapping(at));
+//                    }else{
+//                        Log.d(tag,"Async Data Deleted \n"+new MapperClass().mapping(at));
+//                        db.deleteAsyncTransaction(sts.getDeviceTransactionId());
+//                        sts.setStatus(500);
+//                        db.updateTransaction(sts);
+//                    }
+//                }else
+//                    stopService();
+//            }
+
 //            for(AsyncTransaction at:ats){
 //                MapperClass mc=new MapperClass();
 //                String asyncData=mc.mapping(at);
@@ -209,9 +233,9 @@ public class AppMainService extends Service {
 ////                    }
 //                }
 //            }
-        }else{
-            stopService();
-        }
+//        }else{
+//            stopService();
+//        }
         }
         //Toast.makeText(this,"Task Accomplished:",Toast.LENGTH_SHORT).show();
         return START_STICKY;
@@ -226,12 +250,14 @@ public class AppMainService extends Service {
     }
 
     //___________________Check Transaction__________________________\\
-    private class CheckTrans extends AsyncTask<String, String, String> {
+    private class CheckTrans extends AsyncTask<AsyncTransaction, String, String> {
 
+        AsyncTransaction asyncTransaction;
         @Override
-        protected String doInBackground(String... params) {
+        protected String doInBackground(AsyncTransaction... params) {
             Log.d(tag,"Transaction checking starts, background activity");
-            String transData = params[0];
+            asyncTransaction = params[0];
+            String transData = new MapperClass().mapping(params[0]);
             try {
                 //_____________Opening connection and post data____________//
                 URL oURL = new URL(url);
@@ -251,7 +277,7 @@ public class AppMainService extends Service {
                 BufferedReader in1 = new BufferedReader(
                         new InputStreamReader(con.getInputStream()));
                 String inputLine;
-                StringBuffer response = new StringBuffer();
+                StringBuilder response = new StringBuilder();
 
                 while ((inputLine = in1.readLine()) != null) {
                     response.append(inputLine);
@@ -260,13 +286,7 @@ public class AppMainService extends Service {
                 con.disconnect();
                 return response.toString();
 
-            }  catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }catch (Exception e){
+            } catch (Exception e){
                 e.printStackTrace();
             }
 
@@ -298,33 +318,62 @@ public class AppMainService extends Service {
                     final AsyncTransaction at=ar.getAsyncTransaction();
                     if(at==null){
                         Log.e(tag,"Null result from server");
+                        //post then a transaction on the server
+                        try{
+                            PostPendingTransactionModule postPendingTransactionModule = new PostPendingTransactionModule(context, db.getSingleTransaction(asyncTransaction.getDeviceTransactionId()));
+                            postPendingTransactionModule.startPosting();
+                        }catch (Exception e){
+                            Log.e(tag, "Error: "+e.getMessage());
+                        }
                     }else{
                     final SellingTransaction st=db.getSingleTransaction(at.getDeviceTransactionId());
                     //a transaction has been rejected
-
-                        if(((st.getStatus()==101 ||st.getStatus()==302) || (st.getStatus()==501 || st.getStatus()==500))&& ar.getStastusCode()==100){
-                            //update the database
-                            st.setStatus(ar.getStastusCode());
-                            db.updateTransaction(st);
-                            db.deleteAsyncTransaction(at.getDeviceTransactionId());
-
-                            Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
-                            nozzle.setNozzleIndex(nozzle.getNozzleIndex()+st.getQuantity());
-
-                            //Updating Nozzle indexes
-                            db.updateNozzle(nozzle);
-
-                            //print the receipt
-                            generateReceipt(st);
-
-                        }else{
-
-                            if(ar.getStastusCode()==500){
+                        PaymentMode pm=db.getSinglePaymentMode(st.getPaymentModeId());
+                        if(pm.getName().toLowerCase().equalsIgnoreCase("cash") || pm.getName().toLowerCase().equalsIgnoreCase("debt") || pm.getName().toLowerCase().contains(" CARD")) {
+                            if (((st.getStatus() == 101 || st.getStatus() == 302) || (st.getStatus() == 501 || st.getStatus() == 500)) && ar.getStastusCode() == 100) {
+                                //update the database
                                 st.setStatus(ar.getStastusCode());
                                 db.updateTransaction(st);
                                 db.deleteAsyncTransaction(at.getDeviceTransactionId());
+
+                                if(st.getStatus() != 100 || st.getStatus() != 101){
+                                Nozzle nozzle = db.getSingleNozzle(st.getNozzleId());
+                                nozzle.setNozzleIndex(nozzle.getNozzleIndex() + st.getQuantity());
+
+
+                                //Updating Nozzle indexes
+                                db.updateNozzle(nozzle);
+                                }
+                                //print the receipt
+                                generateReceipt(st);
+                                Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh");
+                                context.sendBroadcast(i);
+
+                            } else {
+
+                                if (ar.getStastusCode() == 500 || ar.getStastusCode() == 100) {
+                                    st.setStatus(ar.getStastusCode());
+                                    db.updateTransaction(st);
+                                    db.deleteAsyncTransaction(at.getDeviceTransactionId());
+                                    Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh");
+                                    context.sendBroadcast(i);
+                                }
+                            }
+
+                        }else{
+                            if (((st.getStatus() == 302) || (st.getStatus() == 501 || st.getStatus() == 500)) && ar.getStastusCode() == 100){
+                                generateReceipt(st);
+                                if(st.getStatus() != 100 || st.getStatus() != 101){
+                                    Nozzle nozzle = db.getSingleNozzle(st.getNozzleId());
+                                    nozzle.setNozzleIndex(nozzle.getNozzleIndex() + st.getQuantity());
+                                    //Updating Nozzle indexes
+                                    db.updateNozzle(nozzle);
+                                }
+                                Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh");
+                                context.sendBroadcast(i);
                             }
                         }
+
 //                    if(ar.getStastusCode()==500 && st.getStatus()==500){
 //                        st.setStatus(500);
 //                        db.updateTransaction(st);
@@ -498,6 +547,9 @@ public class AppMainService extends Service {
                             tp.setCompanyName("N/A");
 
                         tp.setPaymentStatus("Success");
+
+                        st.setStatus(100);
+                        long dbId = db.updateTransaction(st);
                         //launch printing procedure
                         PrintHandler ph=new PrintHandler(context,tp);
                         String print=ph.transPrint();

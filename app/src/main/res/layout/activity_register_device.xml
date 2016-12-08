@@ -1,230 +1,209 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background"
     android:orientation="vertical"
     android:id="@+id/reglayout"
+    android:fillViewport="true"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.aub.oltranz.payfuel.RegisterDevice">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Register Your Device"
-        android:id="@+id/tv"
-        android:layout_gravity="center_horizontal"/>
-
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Email"
-        android:id="@+id/lblUserName"
-        android:layout_marginTop="10dp" />
-
-    <EditText
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:maxLength="30"
-        android:layout_height="40dp"
-        android:layout_width="match_parent"
-        android:background="@drawable/edit_text_shape"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/username"
-        android:hint="Enter a User e-mail" />
-
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Password"
-        android:id="@+id/lblPassword"
-        android:layout_marginTop="10dp" />
-
-    <EditText
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_height="40dp"
-        android:layout_width="match_parent"
-        android:background="@drawable/edit_text_shape"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:inputType="textPassword"
-        android:hint="Enter Password"
-        android:ems="10"
-        android:id="@+id/pw"/>
-
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Device Name"
-        android:id="@+id/lbldevice"
-        android:layout_marginTop="10dp"/>
-
-    <EditText
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_height="40dp"
-        android:layout_width="match_parent"
-        android:background="@drawable/edit_text_shape"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:hint="Enter Device Name"
-        android:id="@+id/devname"
-        android:layout_marginTop="4dp"
-        android:maxLength="20" />
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Retype Device Name"
-        android:layout_marginTop="10dp"/>
-    <EditText
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_height="40dp"
-        android:layout_width="match_parent"
-        android:background="@drawable/edit_text_shape"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:hint="Retype Device Name"
-        android:id="@+id/retypedevname"
-        android:layout_marginTop="4dp"
-        android:maxLength="20" />
-    <Button
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="REGISTER DEVICE"
-        android:textColor="@drawable/text_button_positive"
-        android:background="@drawable/button_shape_positive"
-        android:id="@+id/devreg"
-        android:layout_marginTop="20dp"
-        android:onClick="register" />
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <ImageView
-                android:onClick="login"
-                android:id="@+id/loginLink"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_alignParentStart="true"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:background="@drawable/login_selector"
-                android:scaleType="centerCrop"/>
-            <!--<Button-->
-            <!--android:textStyle="bold"-->
-            <!--android:text="REGISTER DEVICE"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:onClick="register"-->
-            <!--android:textColor="@drawable/text_button_positive"-->
-            <!--android:background="@drawable/button_shape_positive"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginEnd="20dp"-->
-            <!--android:layout_gravity="center_vertical"-->
-            <!--android:layout_weight="1"-->
-            <!--android:id="@+id/regLink"/>-->
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/topBlock"
+                android:layout_alignParentTop="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Register Your Device"
+                    android:id="@+id/popupTv"
+                    android:layout_gravity="center_horizontal"/>
 
-            <ImageView
-                android:onClick="myAdmin"
-                android:id="@+id/adminLink"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:background="@drawable/admin_selector"
-                android:scaleType="centerCrop"/>
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Email"
+                    android:id="@+id/lblUserName"
+                    android:layout_marginTop="10dp" />
 
-            <!--<Button-->
-            <!--android:textStyle="bold"-->
-            <!--android:text="ADMIN"-->
-            <!--android:id="@+id/adminLink"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:textColor="@drawable/text_button_positive"-->
-            <!--android:background="@drawable/button_shape_positive"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_vertical"-->
-            <!--android:layout_weight="1"-->
-            <!--android:onClick="myAdmin"/>-->
-        </RelativeLayout>
-        <!--<RelativeLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
+                <EditText
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:maxLength="30"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/edit_text_shape"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:inputType="textEmailAddress"
+                    android:ems="10"
+                    android:id="@+id/username" />
 
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:text="REGISTER DEVICE"-->
-        <!--android:textColor="@drawable/text_link"-->
-        <!--android:textStyle="bold"-->
-        <!--android:id="@+id/regLink"-->
-        <!--android:clickable="true"-->
-        <!--android:onClick="register"/>-->
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Password"
+                    android:id="@+id/lblPassword"
+                    android:layout_marginTop="10dp" />
 
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:layout_alignBottom="@+id/regLink"-->
-        <!--android:id="@+id/spAdminLink"-->
-        <!--android:text="ENGEN ADMIN"-->
-        <!--android:textStyle="bold"-->
-        <!--android:clickable="true"-->
-        <!--android:onClick="myAdmin"/>-->
+                <EditText
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/edit_text_shape"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:inputType="textPassword"
+                    android:ems="10"
+                    android:id="@+id/pw"/>
 
-        <!--</RelativeLayout>-->
-    </TableRow> <!--<TableRow-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:layout_marginBottom="4dp">-->
-        <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent">-->
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Device Name"
+                    android:id="@+id/lbldevice"
+                    android:layout_marginTop="10dp"/>
 
-            <!--<TextView-->
+                <EditText
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_height="40dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/edit_text_shape"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/devname"
+                    android:maxLength="20"
+                    android:layout_marginTop="2dp"
+                    android:lines="1"
+                    android:inputType="text"/>
+                <TextView
+                    android:id="@+id/lbldeviceretype"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Retype Device Name"
+                    android:layout_marginTop="10dp"/>
+                <EditText
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_height="40dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/edit_text_shape"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/retypedevname"
+                    android:layout_marginTop="2dp"
+                    android:maxLength="20"
+                    android:lines="1"
+                    android:inputType="text"/>
+                <Button
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="REGISTER DEVICE"
+                    android:textColor="@drawable/text_button_positive"
+                    android:background="@drawable/button_shape_positive"
+                    android:id="@+id/devreg"
+                    android:layout_marginTop="20dp"
+                    android:onClick="register" />
+
+            </LinearLayout>
+
+            <TableRow
+                android:id="@+id/bottomBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:onClick="login"
+                        android:id="@+id/loginLink"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:background="@drawable/login_selector"
+                        android:scaleType="centerCrop"/>
+                    <!--<Button-->
+                    <!--android:textStyle="bold"-->
+                    <!--android:text="REGISTER DEVICE"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:onClick="register"-->
+                    <!--android:textColor="@drawable/text_button_positive"-->
+                    <!--android:background="@drawable/button_shape_positive"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="20dp"-->
+                    <!--android:layout_gravity="center_vertical"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:id="@+id/regLink"/>-->
+
+                    <ImageView
+                        android:onClick="myAdmin"
+                        android:id="@+id/adminLink"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:background="@drawable/admin_selector"
+                        android:scaleType="centerCrop"/>
+
+                    <!--<Button-->
+                    <!--android:textStyle="bold"-->
+                    <!--android:text="ADMIN"-->
+                    <!--android:id="@+id/adminLink"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:textColor="@drawable/text_button_positive"-->
+                    <!--android:background="@drawable/button_shape_positive"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_vertical"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:onClick="myAdmin"/>-->
+                </RelativeLayout>
+                <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+
+                <!--<TextView-->
                 <!--android:layout_width="wrap_content"-->
                 <!--android:layout_height="wrap_content"-->
                 <!--android:layout_alignParentLeft="true"-->
                 <!--android:layout_alignParentStart="true"-->
-                <!--android:text="LOGIN"-->
-                <!--android:textStyle="bold"-->
+                <!--android:text="REGISTER DEVICE"-->
                 <!--android:textColor="@drawable/text_link"-->
-                <!--android:id="@+id/loginLink"-->
+                <!--android:textStyle="bold"-->
+                <!--android:id="@+id/regLink"-->
                 <!--android:clickable="true"-->
-                <!--android:onClick="login"/>-->
+                <!--android:onClick="register"/>-->
 
-            <!--<TextView-->
+                <!--<TextView-->
                 <!--android:layout_width="wrap_content"-->
                 <!--android:layout_height="wrap_content"-->
                 <!--android:layout_alignParentRight="true"-->
@@ -236,7 +215,43 @@
                 <!--android:clickable="true"-->
                 <!--android:onClick="myAdmin"/>-->
 
-        <!--</RelativeLayout>-->
-    <!--</TableRow>-->
+                <!--</RelativeLayout>-->
+            </TableRow> <!--<TableRow-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="16dp"-->
+            <!--android:layout_marginBottom="4dp">-->
+            <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
 
-</LinearLayout>
+            <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_alignParentStart="true"-->
+            <!--android:text="LOGIN"-->
+            <!--android:textStyle="bold"-->
+            <!--android:textColor="@drawable/text_link"-->
+            <!--android:id="@+id/loginLink"-->
+            <!--android:clickable="true"-->
+            <!--android:onClick="login"/>-->
+
+            <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_alignParentEnd="true"-->
+            <!--android:layout_alignBottom="@+id/regLink"-->
+            <!--android:id="@+id/spAdminLink"-->
+            <!--android:text="ENGEN ADMIN"-->
+            <!--android:textStyle="bold"-->
+            <!--android:clickable="true"-->
+            <!--android:onClick="myAdmin"/>-->
+
+            <!--</RelativeLayout>-->
+            <!--</TableRow>-->
+
+        </RelativeLayout>
+
+</ScrollView>

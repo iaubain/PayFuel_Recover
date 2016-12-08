@@ -62,8 +62,37 @@ public class PaymentAdapter extends BaseAdapter {
         PaymentMode pm=new PaymentMode();
         pm=mData.get(position);
         pId.setText(String.valueOf(pm.getPaymentModeId()));
-        pName.setText(pm.getName());
-
+        if(pm.getName().equalsIgnoreCase("cash")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.cash, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("voucher")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.voucher, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("mtn")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.mtnmobilemoney, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("tigo")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.tigocash, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("airtel")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.airtel, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("visa")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.visa, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("master")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.mastercard, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("debt")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.debt, 0, 0);
+        }else if(pm.getName().equalsIgnoreCase("engen card")){
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.engenonecard, 0, 0);
+        }else{
+            pName.setText(pm.getName());
+            pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.cash, 0, 0);
+        }
 
         return gridViewElement;
     }

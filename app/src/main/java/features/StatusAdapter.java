@@ -1,6 +1,7 @@
 package features;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import com.aub.oltranz.payfuel.R;
 import java.util.List;
 
 import appBean.GridData;
+import databaseBean.DBHelper;
+import entities.Nozzle;
 
 /**
  * Created by Owner on 5/17/2016.
@@ -23,9 +26,11 @@ public class StatusAdapter extends BaseAdapter {
 
     private Context context;
     private final List<GridData> mData;
-
+    Typeface font;
+    DBHelper db;
     public StatusAdapter(Context context, List<GridData> mData) {
         Log.d(tag,"Initialise griview Content");
+        font=Typeface.createFromAsset(context.getAssets(), "font/ubuntu.ttf");
         if(mData.isEmpty() || mData.size()<=0){
             GridData gridData=new GridData();
 
@@ -37,6 +42,7 @@ public class StatusAdapter extends BaseAdapter {
         }
         this.context = context;
         this.mData = mData;
+        db = new DBHelper(context);
     }
     @Override
     public int getCount() {
@@ -65,13 +71,26 @@ public class StatusAdapter extends BaseAdapter {
 
         // set values
         TextView nozzleId = (TextView) gridViewElement.findViewById(R.id.nozzleid);
+
         TextView nozzleName = (TextView) gridViewElement.findViewById(R.id.nozzlename);
+        nozzleName.setTypeface(font);
+
         TextView pumpId = (TextView) gridViewElement.findViewById(R.id.pumpid);
+
         TextView pumpName = (TextView) gridViewElement.findViewById(R.id.pumpname);
+        pumpName.setTypeface(font);
+
         TextView product = (TextView) gridViewElement.findViewById(R.id.nozzleproduct);
+        product.setTypeface(font);
+
         TextView index = (TextView) gridViewElement.findViewById(R.id.index);
+        index.setTypeface(font);
+
         TextView price = (TextView) gridViewElement.findViewById(R.id.price);
+        price.setTypeface(font);
+
         TextView productId = (TextView) gridViewElement.findViewById(R.id.productid);
+
         ImageView icon=(ImageView) gridViewElement.findViewById(R.id.nozzleicon);
 
             GridData gridData=new GridData();
@@ -83,7 +102,8 @@ public class StatusAdapter extends BaseAdapter {
             productId.setText(String.valueOf(gridData.getProductId()));
             pumpId.setText(String.valueOf(gridData.getPumpId()));
             pumpName.setText(gridData.getPumpName());
-            index.setText(gridData.getIndex());
+            Nozzle nozzle = db.getSingleNozzle(gridData.getNozzleId());
+            index.setText(String.valueOf(nozzle.getNozzleIndex()));
 
 
         return gridViewElement;

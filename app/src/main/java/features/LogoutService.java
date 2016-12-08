@@ -78,6 +78,11 @@ public class LogoutService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(tag, "Service Received Start Command");
+        try{
+            db.deleteOldTransaction();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         if(intent != null && intent.getExtras() != null){
             try {

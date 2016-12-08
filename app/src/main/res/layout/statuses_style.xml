@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sales_shape">
+
+<TableRow
+    android:layout_width="match_parent"
+    android:gravity="center_horizontal"
     android:layout_height="wrap_content">
-
-
     <ImageView
         android:id="@+id/nozzleicon"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:layout_gravity="center_vertical"
         android:layout_marginStart="10dp"
+        android:layout_gravity="center_horizontal"
         android:padding="5dp"
-        android:background="@drawable/nozzle_blue"/>
-
+        android:src="@drawable/nozzle_blue"/>
+</TableRow>
 
         <TextView
             android:id="@+id/nozzlename"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Nozzle Name"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_marginStart="10dp"
@@ -26,21 +32,25 @@
             android:textColor="@color/positive" />
         <TextView
             android:id="@+id/nozzleproduct"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="nozzleproduct"
             android:layout_marginStart="10dp"/>
         <TextView
             android:id="@+id/index"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Index: "
+            android:textStyle="bold"
             android:layout_marginStart="10dp"/>
 
         <TextView
             android:id="@+id/pumpname"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="pumpname"
             android:layout_marginStart="10dp"/>
         <TextView

@@ -22,12 +22,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> listDataHeader; // header titles
     // child data in format of header title, child title
     private HashMap<String, List<String>> listDataChild;
+    Typeface font;
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
                                  HashMap<String, List<String>> listChildData) {
         this.context = context;
         this.listDataHeader = listDataHeader;
         this.listDataChild = listChildData;
+        font=Typeface.createFromAsset(context.getAssets(), "font/ubuntu.ttf");
     }
 
     @Override
@@ -54,7 +56,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         TextView txtListChild = (TextView) convertView.findViewById(R.id.lblListItem);
-
+        txtListChild.setTypeface(font);
         txtListChild.setText(childText);
         return convertView;
     }
@@ -92,7 +94,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         TextView lblListHeader = (TextView) convertView
                 .findViewById(R.id.lblListHeader);
-        lblListHeader.setTypeface(null, Typeface.BOLD);
+        lblListHeader.setTypeface(font, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
 
         return convertView;
