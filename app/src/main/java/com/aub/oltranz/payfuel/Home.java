@@ -119,22 +119,6 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
             StrictMode.setThreadPolicy(policy);
         }
         barProgressDialog = new ProgressDialog(Home.this);
-//        progress = new Dialog (this);
-//        progress.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        progress.setContentView(R.layout.progress);
-//        progress.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-
-        Calendar cal = Calendar.getInstance();
-        Intent alarmIntent = new Intent(context, CheckTransaction.class);
-        PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        //clean alarm cache for previous pending intent
-        alarm.cancel(pintent);
-
-        alarmIntent = new Intent(context, AppMainService.class);
-        pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-        //clean alarm cache for previous pending intent
-        alarm.cancel(pintent);
     }
 
     //Handle longin button
@@ -287,17 +271,17 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
                                             if (loadPayment(this, userId)) {
                                                 // Redirect the user to select pump_nozzles page
                                                // showDialog("Logging In. Done...");
-                                                ServiceCheck sc=new ServiceCheck(this);
-                                                if(!sc.isMyServiceRunning(AppMainService.class)){
-                                                    Calendar cal = Calendar.getInstance();
-                                                    Intent alarmIntent = new Intent(context, AppMainService.class);
-                                                    PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-                                                    AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                                                    //clean alarm cache for previous pending intent
-                                                    alarm.cancel(pintent);
-                                                    // schedule for every 4 seconds
-                                                    alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-                                                }
+//                                                ServiceCheck sc=new ServiceCheck(this);
+//                                                if(!sc.isMyServiceRunning(AppMainService.class)){
+//                                                    Calendar cal = Calendar.getInstance();
+//                                                    Intent alarmIntent = new Intent(context, AppMainService.class);
+//                                                    PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//                                                    AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//                                                    //clean alarm cache for previous pending intent
+//                                                    alarm.cancel(pintent);
+//                                                    // schedule for every 4 seconds
+//                                                    alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
+//                                                }
                                                 intent = new Intent(context, SelectPumps.class);
                                                 Bundle bundle = new Bundle();
                                                 bundle.putString(getResources().getString(R.string.userid), String.valueOf(userId));
@@ -318,17 +302,17 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
                                         //Select pump_nozzles page redirection
                                                 // Redirect the use to sale page
                                                // showDialog("Logging In. Done...");
-                                        ServiceCheck sc=new ServiceCheck(this);
-                                        if(!sc.isMyServiceRunning(AppMainService.class)){
-                                            Calendar cal = Calendar.getInstance();
-                                            Intent alarmIntent = new Intent(context, AppMainService.class);
-                                            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-                                            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                                            //clean alarm cache for previous pending intent
-                                            alarm.cancel(pintent);
-                                            // schedule for every 4 seconds
-                                            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-                                        }
+//                                        ServiceCheck sc=new ServiceCheck(this);
+//                                        if(!sc.isMyServiceRunning(AppMainService.class)){
+//                                            Calendar cal = Calendar.getInstance();
+//                                            Intent alarmIntent = new Intent(context, AppMainService.class);
+//                                            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//                                            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//                                            //clean alarm cache for previous pending intent
+//                                            alarm.cancel(pintent);
+//                                            // schedule for every 4 seconds
+//                                            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
+//                                        }
 
                                                 intent = new Intent(context, SellingTabHost.class);
                                                 Bundle bundle = new Bundle();
@@ -382,17 +366,17 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
                                         // Redirect the use to sale page
                                        // showDialog("Logging In. Done...");
 
-                                        ServiceCheck sc=new ServiceCheck(this);
-                                        if(!sc.isMyServiceRunning(AppMainService.class)){
-                                            Calendar cal = Calendar.getInstance();
-                                            Intent alarmIntent = new Intent(context, AppMainService.class);
-                                            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-                                            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                                            //clean alarm cache for previous pending intent
-                                            alarm.cancel(pintent);
-                                            // schedule for every 4 seconds
-                                            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-                                        }
+//                                        ServiceCheck sc=new ServiceCheck(this);
+//                                        if(!sc.isMyServiceRunning(AppMainService.class)){
+//                                            Calendar cal = Calendar.getInstance();
+//                                            Intent alarmIntent = new Intent(context, AppMainService.class);
+//                                            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//                                            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//                                            //clean alarm cache for previous pending intent
+//                                            alarm.cancel(pintent);
+//                                            // schedule for every 4 seconds
+//                                            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
+//                                        }
 
                                         intent = new Intent(context, SelectPumps.class);
                                         Bundle bundle = new Bundle();
@@ -441,17 +425,17 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
                                     // Redirect the use to sale page
                                    // showDialog("Logging In. Done...");
 
-                                    ServiceCheck sc=new ServiceCheck(this);
-                                    if(!sc.isMyServiceRunning(AppMainService.class)){
-                                        Calendar cal = Calendar.getInstance();
-                                        Intent alarmIntent = new Intent(context, AppMainService.class);
-                                        PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-                                        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                                        //clean alarm cache for previous pending intent
-                                        alarm.cancel(pintent);
-                                        // schedule for every 4 seconds
-                                        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-                                    }
+//                                    ServiceCheck sc=new ServiceCheck(this);
+//                                    if(!sc.isMyServiceRunning(AppMainService.class)){
+//                                        Calendar cal = Calendar.getInstance();
+//                                        Intent alarmIntent = new Intent(context, AppMainService.class);
+//                                        PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//                                        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//                                        //clean alarm cache for previous pending intent
+//                                        alarm.cancel(pintent);
+//                                        // schedule for every 4 seconds
+//                                        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
+//                                    }
 
                                     intent = new Intent(context, SelectPumps.class);
                                     Bundle bundle = new Bundle();

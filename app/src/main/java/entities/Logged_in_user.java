@@ -1,6 +1,7 @@
 package entities;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Logged_in_user {
 	public Logged_in_user() {

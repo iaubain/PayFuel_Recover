@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.payfuel.Selling;
 
 import java.util.List;
 
@@ -18,11 +19,12 @@ import databaseBean.DBHelper;
 import entities.Nozzle;
 import entities.SellingTransaction;
 import models.TransactionPrint;
+import modules.TransactionPrintModule;
 
 /**
  * Created by Owner on 6/10/2016.
  */
-public class RecordAdapter extends ArrayAdapter<SellingTransaction> {
+public class RecordAdapter extends ArrayAdapter<SellingTransaction> implements TransactionPrintModule.TransactionPrintInteraction {
     String tag="PayFuel: "+getClass().getSimpleName();
     private final Activity context;
     private final int userId;
@@ -101,83 +103,23 @@ public class RecordAdapter extends ArrayAdapter<SellingTransaction> {
     public void printAction(final long traId){
         final SellingTransaction st=db.getSingleTransaction(traId);
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.v(tag,"Running a printing thread");
-                try{
-                    if(st.getStatus()==100 || st.getStatus()==101){
-
-                        TransactionPrint tp=new TransactionPrint();
-
-                        tp.setAmount(st.getAmount());
-                        tp.setQuantity(st.getQuantity());
-                        tp.setBranchName(db.getSingleUser(userId).getBranch_name());
-                        tp.setDeviceId(db.getSingleDevice().getDeviceNo());
-                        tp.setUserName(db.getSingleUser(userId).getName());
-                        tp.setDeviceTransactionId(String.valueOf(traId));
-                        tp.setDeviceTransactionTime(st.getDeviceTransactionTime());
-                        tp.setNozzleName(db.getSingleNozzle(st.getNozzleId()).getNozzleName());
-                        tp.setPaymentMode(db.getSinglePaymentMode(st.getPaymentModeId()).getName());
-
-                        if(st.getPlateNumber()!=null)
-                            tp.setPlateNumber(st.getPlateNumber());
-                        else
-                            tp.setPlateNumber("N/A");
-
-                        tp.setProductName(db.getSingleNozzle(st.getNozzleId()).getProductName());
-                        tp.setPumpName(db.getSinglePump(st.getPumpId()).getPumpName());
-
-                        if(st.getTelephone()!=null)
-                            tp.setTelephone(st.getTelephone());
-                        else
-                            tp.setTelephone("N/A");
-
-                        if(st.getTin()!=null)
-                            tp.setTin(st.getTin());
-                        else
-                            tp.setTin("N/A");
-
-                        if(st.getVoucherNumber()!=null)
-                            tp.setVoucherNumber(st.getVoucherNumber());
-                        else
-                            tp.setVoucherNumber("N/A");
-
-                        if(st.getName()!=null)
-                            tp.setCompanyName(st.getName());
-                        else
-                            tp.setCompanyName("N/A");
-
-                        if(st.getStatus()==100 || st.getStatus()==101){
-                            tp.setPaymentStatus("Success");
-                            //launch printing procedure
-                            PrintHandler ph=new PrintHandler(context,tp);
-                            String print=ph.transPrint();
-                            if(!print.equalsIgnoreCase("Success")){
-                                uiFeedBack(print);
-                            }
-                        }else{
-                            //Update the status to generate the the print out finally
-                            if(st.getStatus()!=500){
-                                uiFeedBack("Failed to generate receipt: "+st.getStatus());
-                            }
-                        }
-                    }else if(st.getStatus()==301){
-                        st.setStatus(302);
-                        long dbId=db.updateTransaction(st);
-                        if(dbId <=0)
-                            uiFeedBack("Failed to generate receipt: "+traId);
-                    }
-                }catch (Exception e){
-                    uiFeedBack(e.getMessage());
-                    e.printStackTrace();
-                }
+        if(st.getStatus() == 100){
+            try{
+                TransactionPrintModule transactionPrintModule = new TransactionPrintModule(RecordAdapter.this, context, userId, db, st);
+                transactionPrintModule.generateReceipt();
+            }catch (Exception e){
+                e.printStackTrace();
+                uiFeedBack("Error: "+e.getCause());
             }
-        };
-        new Thread(runnable).start();
+        }
     }
 
     public void uiFeedBack(String message){
         Toast.makeText(context, message , Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void printResult(String printingMessage) {
+        uiFeedBack(printingMessage);
     }
 }

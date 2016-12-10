@@ -185,7 +185,7 @@ public class TransactionProcess implements HandleUrlInterface {
                                             tp.setPaymentStatus("Success");
                                             //launch printing procedure
                                             PrintHandler ph=new PrintHandler(context,tp);
-                                            String print=ph.transPrint();
+                                            String print=ph.transPrint(tp);
                                             if(!print.equalsIgnoreCase("Success")){
                                                 Log.e(tag,print);
                                             }

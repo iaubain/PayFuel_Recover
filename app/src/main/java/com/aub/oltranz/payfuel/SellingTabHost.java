@@ -41,6 +41,8 @@ import features.PreferenceManager;
 import models.LogoutData;
 import models.MapperClass;
 import modules.ClearPending;
+import utilities.MyAlarmManager;
+import utilities.PeriodicTransactionService;
 
 public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeListener, HandleUrlInterface {
     String tag="PayFuel: "+getClass().getSimpleName();
@@ -126,6 +128,8 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
         } catch(IllegalArgumentException e) {
             e.printStackTrace();
         }
+
+        scheduleAlarm();
     }
 
     public void userValidity(){
@@ -216,6 +220,47 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
 
     }
 
+    // Setup a recurring alarm every 4 sec
+    public void scheduleAlarm() {
+
+        Calendar cal = Calendar.getInstance();
+        Intent alarmIntent = new Intent(context, PeriodicTransactionService.class);
+        alarmIntent.setAction(PeriodicTransactionService.ACTION);
+        Bundle bundle = new Bundle();
+        bundle.putInt(PeriodicTransactionService.USER_ID_PARAM, userId);
+        alarmIntent.putExtras(bundle);
+        PendingIntent pintent = PendingIntent.getService(context,
+                MyAlarmManager.REQUEST_CODE,
+                alarmIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
+
+
+
+
+//        Intent intent = new Intent(this, PeriodicTransactionService.class);
+//        intent.setAction(PeriodicTransactionService.ACTION);
+//        Bundle bundle = new Bundle();
+//        bundle.putInt(PeriodicTransactionService.USER_ID_PARAM, userId);
+//        intent.putExtras(bundle);
+//        PendingIntent pIntent = PendingIntent.getBroadcast(context,
+//                MyAlarmManager.REQUEST_CODE,
+//                intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
+//        long firstMillis = System.currentTimeMillis(); // alarm is set right away
+//        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+//        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, 1000*4, pIntent);
+    }
+
+    public void cancelAlarm() {
+        Intent intent = new Intent(getApplicationContext(), MyAlarmManager.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmManager.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarm.cancel(pIntent);
+    }
+
     public void refresh(){
         Log.d(tag, "Refreshing the tabs");
 
@@ -281,13 +326,15 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
 
                 startService(logoutIntent);
 
+                //cancel alarm
+                cancelAlarm();
 
-//                Calendar cal = Calendar.getInstance();
-//                Intent alarmIntent = new Intent(context, CheckTransaction.class);
-//                PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-//                AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//                //clean alarm cache for previous pending intent
-//                alarm.cancel(pintent);
+                //invalidate broadcast listener
+                try{
+                    unregisterReceiver(broadcastReceiver);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
 
                 intent=new Intent(getApplicationContext(),Home.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -398,28 +445,36 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
                     dialog.dismiss();
 
                     try{
-                        List<AsyncTransaction> asyncTransactionsTemp = new ArrayList<AsyncTransaction>();
-                        List<AsyncTransaction> asyncTransactionList = db.getAllAsyncTransactions(userId);
-                        for(AsyncTransaction asyncTransaction : asyncTransactionList){
-                            SellingTransaction sellingTransaction = db.getSingleTransaction(asyncTransaction.getDeviceTransactionId());
-                            PaymentMode paymentMode = db.getSinglePaymentMode(sellingTransaction.getPaymentModeId());
+//                        List<AsyncTransaction> asyncTransactionsTemp = new ArrayList<AsyncTransaction>();
+//                        List<AsyncTransaction> asyncTransactionList = db.getAllAsyncTransactions(userId);
+//                        for(AsyncTransaction asyncTransaction : asyncTransactionList){
+//                            SellingTransaction sellingTransaction = db.getSingleTransaction(asyncTransaction.getDeviceTransactionId());
+//                            PaymentMode paymentMode = db.getSinglePaymentMode(sellingTransaction.getPaymentModeId());
+//
+//                            if(paymentMode.getName().toLowerCase().contains("tigo") || paymentMode.getName().toLowerCase().contains("mtn") || paymentMode.getName().toLowerCase().contains("airtel")){
+//                                if(asyncTransaction.getSum() <= 40){
+//                                    db.deleteAsyncTransaction(asyncTransaction.getDeviceTransactionId());
+//                                    if(sellingTransaction.getStatus() != 100){
+//                                        sellingTransaction.setStatus(500);
+//                                        db.updateTransaction(sellingTransaction);
+//                                    }
+//                                }else
+//                                    asyncTransactionsTemp.add(asyncTransaction);
+//                            }else
+//                                asyncTransactionsTemp.add(asyncTransaction);
+//                        }
+//
+                        Intent i = new Intent(context, PeriodicTransactionService.class);
+                        i.setAction(PeriodicTransactionService.ACTION);
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putInt(PeriodicTransactionService.USER_ID_PARAM, userId);
+                        i.putExtras(bundle1);
+                        context.startService(i);
 
-                            if(paymentMode.getName().toLowerCase().contains("tigo") || paymentMode.getName().toLowerCase().contains("mtn") || paymentMode.getName().toLowerCase().contains("airtel")){
-                                if(asyncTransaction.getSum() <= 40){
-                                    db.deleteAsyncTransaction(asyncTransaction.getDeviceTransactionId());
-                                    if(sellingTransaction.getStatus() != 100){
-                                        sellingTransaction.setStatus(500);
-                                        db.updateTransaction(sellingTransaction);
-                                    }
-                                }else
-                                    asyncTransactionsTemp.add(asyncTransaction);
-                            }else
-                                asyncTransactionsTemp.add(asyncTransaction);
-                        }
-                        if(!asyncTransactionsTemp.isEmpty()){
-                            ClearPending clearPending = new ClearPending(SellingTabHost.this, db.getAllAsyncTransactions(userId), db);
-                            clearPending.startClearing();
-                        }
+//                        if(!asyncTransactionsTemp.isEmpty()){
+//                            ClearPending clearPending = new ClearPending(SellingTabHost.this, db.getAllAsyncTransactions(userId), db);
+//                            clearPending.startClearing();
+//                        }
                     }catch (Exception e){
                         e.printStackTrace();
                     }

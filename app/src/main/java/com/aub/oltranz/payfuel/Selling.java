@@ -1,7 +1,9 @@
 package com.aub.oltranz.payfuel;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,7 +33,6 @@ import android.widget.Toast;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import appBean.GridData;
@@ -43,20 +44,22 @@ import entities.Pump;
 import entities.SellingTransaction;
 import entities.WorkStatus;
 import features.PaymentAdapter;
-import features.PrintHandler;
 import features.StatusAdapter;
-import models.TransactionPrint;
-import modules.TransactionManagementModule;
+import modules.TransactionPreparation;
+import modules.TransactionPrintModule;
 import progressive.Confirmation;
 import progressive.PayDetails;
 import progressive.PumpDetails;
 import progressive.TransValue;
 import progressive.TransactionFeedsInterface;
 import progressive.TransactionProcess;
+import utilities.MyAlarmManager;
+import utilities.PeriodicTransactionService;
 
 public class Selling extends ActionBarActivity implements AdapterView.OnItemClickListener,
         TransactionFeedsInterface,
-        TransactionManagementModule.TransactionManagmentInteraction {
+        TransactionPreparation.TransactionPreparationInteraction,
+        TransactionPrintModule.TransactionPrintInteraction {
 
     String tag = "PayFuel: " + getClass().getSimpleName();
     int userId;
@@ -950,66 +953,17 @@ public class Selling extends ActionBarActivity implements AdapterView.OnItemClic
                 sTransaction.setVoucherNumber(payD.getVoucher());
                 sTransaction.setAuthenticationCode(payD.getAuthentCode());
                 sTransaction.setAuthorisationCode(payD.getAuthorCode());
-                sTransaction.setStatus(301);
 
-                TransactionManagementModule transactionManagementModule=new TransactionManagementModule(Selling.this, Selling.this, sTransaction, userId, db);
-                transactionManagementModule.startTransaction();
-//                Runnable runnable = new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.v(tag, "Loading Transaction Logs");
-//                        try {
-//
-//                            runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    if (clickCount[0] <= 0) {
-//                                        sTransaction.setUserId(userId);
-//                                        sTransaction.setBranchId(branchId);
-//                                        sTransaction.setDeviceNo(db.getSingleDevice().getDeviceNo());
-//                                        sTransaction.setProductId(nozzle.getProductId());
-//                                        sTransaction.setPaymentModeId(pm.getPaymentModeId());
-//                                        sTransaction.setNozzleId(nozzle.getNozzleId());
-//                                        sTransaction.setPumpId(pump.getPumpId());
-//                                        sTransaction.setAmount(tValue.getAmnt());
-//                                        sTransaction.setQuantity(tValue.getQty());
-//                                        sTransaction.setPlateNumber(tValue.getPlateNumber());
-//                                        sTransaction.setTelephone(payD.getTel());
-//                                        sTransaction.setName(tValue.getName());
-//                                        sTransaction.setTin(tValue.getTin());
-//                                        sTransaction.setVoucherNumber(payD.getVoucher());
-//                                        sTransaction.setAuthenticationCode(payD.getAuthentCode());
-//                                        sTransaction.setAuthorisationCode(payD.getAuthorCode());
-//                                        sTransaction.setStatus(301);
-//
-//                                        TransactionManagementModule transactionManagementModule=new TransactionManagementModule(Selling.this, Selling.this, sTransaction, userId, db);
-//                                        transactionManagementModule.startTransaction();
-//                                      //  setReceipt(startSellingProcess(sTransaction));
-//
-//                                        clickCount[0] += 1;
-//                                    } else {
-//                                        //do something when tries to click more than one time
-//                                        Log.e(tag, "Clicking more than one time same button");
-//                                    }
-//                                }
-//                            });
-//
-//                        } catch (Exception e) {
-//                            tv.setText("Error Occured");
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                };
-//                new Thread(runnable).start();
-
+                TransactionPreparation transactionPreparation =new TransactionPreparation(Selling.this, Selling.this, sTransaction, userId, db);
+                transactionPreparation.startTransactionPreparation();
             }
         });
 
         dialog.show();
     }
 
-    public void setReceipt(final long transactionId) {
-        Log.d(tag, "Setting receipt generator for transaction: " + transactionId);
+    public void setReceipt(final SellingTransaction sellingTransaction) {
+        Log.d(tag, "Setting receipt generator for transaction: " + sellingTransaction.getDeviceTransactionId());
         if (dialog.isShowing()) {
             dialog.dismiss();
             dialog = new Dialog(this);
@@ -1017,6 +971,8 @@ public class Selling extends ActionBarActivity implements AdapterView.OnItemClic
         dialog.setContentView(R.layout.receipt_layout);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
+
+        final long transactionId = sellingTransaction.getDeviceTransactionId();
 
         int dividerId = dialog.getContext().getResources().getIdentifier("android:id/titleDivider", null, null);
         try{
@@ -1039,98 +995,21 @@ public class Selling extends ActionBarActivity implements AdapterView.OnItemClic
                 yes.setClickable(false);
                 no.setEnabled(false);
                 no.setClickable(false);
-
                 receipt = true;
                 resetValue();
                 final SellingTransaction st = db.getSingleTransaction(transactionId);
-
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.v(tag, "Running a printing thread");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    if (st.getStatus() == 100 || st.getStatus() == 101) {
-
-                                        TransactionPrint tp = new TransactionPrint();
-
-                                        tp.setAmount(st.getAmount());
-                                        tp.setQuantity(st.getQuantity());
-                                        tp.setBranchName(db.getSingleUser(userId).getBranch_name());
-                                        tp.setDeviceId(db.getSingleDevice().getDeviceNo());
-                                        tp.setUserName(db.getSingleUser(userId).getName());
-                                        tp.setDeviceTransactionId(String.valueOf(transactionId));
-                                        tp.setDeviceTransactionTime(st.getDeviceTransactionTime());
-                                        tp.setNozzleName(db.getSingleNozzle(st.getNozzleId()).getNozzleName());
-                                        tp.setPaymentMode(db.getSinglePaymentMode(st.getPaymentModeId()).getName());
-
-                                        if (st.getPlateNumber() != null)
-                                            tp.setPlateNumber(st.getPlateNumber());
-                                        else
-                                            tp.setPlateNumber("N/A");
-
-                                        tp.setProductName(db.getSingleNozzle(st.getNozzleId()).getProductName());
-                                        tp.setPumpName(db.getSinglePump(st.getPumpId()).getPumpName());
-
-                                        if (st.getTelephone() != null)
-                                            tp.setTelephone(st.getTelephone());
-                                        else
-                                            tp.setTelephone("N/A");
-
-                                        if (st.getTin() != null)
-                                            tp.setTin(st.getTin());
-                                        else
-                                            tp.setTin("N/A");
-
-                                        if (st.getVoucherNumber() != null)
-                                            tp.setVoucherNumber(st.getVoucherNumber());
-                                        else
-                                            tp.setVoucherNumber("N/A");
-
-                                        if (st.getName() != null)
-                                            tp.setCompanyName(st.getName());
-                                        else
-                                            tp.setCompanyName("N/A");
-
-
-                                        tp.setPaymentStatus("Success");
-
-                                        st.setStatus(100);
-                                        long dbId = db.updateTransaction(st);
-
-                                        //launch printing procedure
-                                        PrintHandler ph = new PrintHandler(context, tp);
-                                        String print = ph.transPrint();
-                                        if (!print.equalsIgnoreCase("Success")) {
-                                            uiFeedBack(print);
-                                        }
-                                    }else if(st.getStatus() == 301){
-                                        st.setStatus(302);
-                                        long dbId = db.updateTransaction(st);
-                                        if (dbId <= 0)
-                                            uiFeedBack("Failed to generate receipt: " + transactionId);
-                                    }else if(st.getStatus() == 500 || st.getStatus() == 501){
-                                        db.deleteAsyncTransaction(st.getDeviceTransactionId());
-                                    } else {
-                                        uiFeedBack("Failed transaction can't generate receipt: " + transactionId);
-                                    }
-                                } catch (Exception e) {
-                                    uiFeedBack(e.getMessage());
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                if(st.getStatus() == 100){
+                    try{
+                        TransactionPrintModule transactionPrintModule = new TransactionPrintModule(Selling.this, Selling.this, userId, db, st);
+                        transactionPrintModule.generateReceipt();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        uiFeedBack("Error: "+e.getCause());
                     }
-                };
-                new Thread(runnable).start();
-
-
-                //initialize activity UI
-                //initAppUI();
-
-                refresh();
+                }else{
+                    st.setStatus(st.getStatus()+1);
+                    db.updateTransaction(st);
+                }
                 uiTransactionData(st);
                 dialog.dismiss();
             }
@@ -1144,8 +1023,6 @@ public class Selling extends ActionBarActivity implements AdapterView.OnItemClic
 
                 SellingTransaction st = db.getSingleTransaction(transactionId);
                 //initialize activity UI
-                //initAppUI();
-                refresh();
                 uiTransactionData(st);
                 dialog.dismiss();
             }
@@ -1187,20 +1064,22 @@ public class Selling extends ActionBarActivity implements AdapterView.OnItemClic
      * @param message
      */
     public void uiFeedBack(String message) {
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                tv.setText("");
-//            }
-//        }, 3000);
-//        if(dialog.isShowing())
-//            dialog.dismiss();
-        if (message == null || TextUtils.isEmpty(message)) {
-            tv.setText(getResources().getString(R.string.nulluifeedback));
-        } else {
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            tv.setText(message);
+        try{
+            if(!TextUtils.isEmpty(message)){
+                tv.setVisibility(View.VISIBLE);
+                tv.setText(message);
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText("");
+                        tv.setVisibility(View.INVISIBLE);
+                    }
+                }, 1000*5);// 5sec
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1234,15 +1113,18 @@ public class Selling extends ActionBarActivity implements AdapterView.OnItemClic
     }
 
     @Override
-    public void onTransactionManagmentInteraction(int statusCode, long transactionId, String message, SellingTransaction sellingTransaction) {
-        if(statusCode == 1){
-            refresh();
-            setReceipt(transactionId);
-        }else if(statusCode == 0){
+    public void onTransactionPreparation(boolean status, SellingTransaction sellingTransaction) {
+        if(!status){
             //failure during transaction recording
-            refresh();
-            setReceipt(transactionId);
+            Log.e(tag,"Failed to record transaction");
+        }else{
+            setReceipt(sellingTransaction);
         }
+    }
+
+    @Override
+    public void printResult(String printingMessage) {
+        uiFeedBack(printingMessage);
     }
 
     public interface SellingInteraction{

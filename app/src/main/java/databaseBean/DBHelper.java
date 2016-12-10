@@ -342,7 +342,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if(st.getStatus()!= 0)
             values.put(status,st.getStatus());
         else
-            values.put(status,500);
+            values.put(status,301);
         //use the default in the database
        // values.put(time,st.getDeviceTransactionTime());
 

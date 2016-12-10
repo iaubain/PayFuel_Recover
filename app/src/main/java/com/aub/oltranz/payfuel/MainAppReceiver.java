@@ -21,14 +21,14 @@ public class MainAppReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)){
             Log.d(tag, "Boot Complete Broad Cast Received");
 
-            Calendar cal = Calendar.getInstance();
-            Intent alarmIntent = new Intent(context, AppMainService.class);
-            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            //clean alarm cache for previous pending intent
-            alarm.cancel(pintent);
-            // schedule for every 4 seconds
-            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
+//            Calendar cal = Calendar.getInstance();
+//            Intent alarmIntent = new Intent(context, AppMainService.class);
+//            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//            //clean alarm cache for previous pending intent
+//            alarm.cancel(pintent);
+//            // schedule for every 4 seconds
+//            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
 
             Intent i1=new Intent(context,Home.class);
             i1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

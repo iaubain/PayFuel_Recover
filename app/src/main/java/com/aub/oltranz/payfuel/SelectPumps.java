@@ -577,17 +577,17 @@ public class SelectPumps extends ActionBarActivity implements AdapterView.OnItem
                         PreferenceManager prefs=new PreferenceManager(this);
                         prefs.createPreference(userId);
 
-                        ServiceCheck sc=new ServiceCheck(this);
-                        if(!sc.isMyServiceRunning(AppMainService.class)){
-                            Calendar cal = Calendar.getInstance();
-                            Intent alarmIntent = new Intent(context, AppMainService.class);
-                            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-                            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                            //clean alarm cache for previous pending intent
-                            alarm.cancel(pintent);
-                            // schedule for every 4 seconds
-                            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-                        }
+//                        ServiceCheck sc=new ServiceCheck(this);
+//                        if(!sc.isMyServiceRunning(AppMainService.class)){
+//                            Calendar cal = Calendar.getInstance();
+//                            Intent alarmIntent = new Intent(context, AppMainService.class);
+//                            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
+//                            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//                            //clean alarm cache for previous pending intent
+//                            alarm.cancel(pintent);
+//                            // schedule for every 4 seconds
+//                            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
+//                        }
 
                         intent = new Intent(this, SellingTabHost.class);
                         Bundle bundle = new Bundle();

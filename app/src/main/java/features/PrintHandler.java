@@ -25,13 +25,8 @@ public class PrintHandler {
     String tag="PayFuel: "+getClass().getSimpleName();
     Context context;
     int size;
-    Object data;
-    ThermalPrinter thermalPrinter;
-    byte[] lineBuffer;
-
-    int i,state;
-    int ret = -1;
-    boolean blnRet = false;
+    private Object data;
+    private ThermalPrinter thermalPrinter;
 
     public PrintHandler(Context context, Object data) {
         Log.d(tag, "Initiating a print");
@@ -41,22 +36,25 @@ public class PrintHandler {
     }
 
     public String printOut(){
-        ret = thermalPrinter.getState();
-        Log.v("PRINT", "getState:"+ret);
+        int ret = thermalPrinter.getState();
+        Log.v("PRINT", "getState:"+ ret);
 
         ret = thermalPrinter.getTemperature();
-        Log.v("PRINT", "getTemperature:"+ret);
+        Log.v("PRINT", "getTemperature:"+ ret);
 
-        blnRet = thermalPrinter.isOverTemperature();
-        Log.v("PRINT", "isOverTemperature:"+blnRet);
+        boolean blnRet = thermalPrinter.isOverTemperature();
+        Log.v("PRINT", "isOverTemperature:"+ blnRet);
 
         blnRet = thermalPrinter.isPaperOut();
         Log.v("PRINT", "isPaperOut:" + blnRet);
 
         if ((!thermalPrinter.isOverTemperature())&&(!thermalPrinter.isPaperOut())&&(thermalPrinter.getState() > -1)){
             //check the type of Object that came
-            if(data.getClass().getSimpleName().equalsIgnoreCase("TransactionPrint")){
-                return transPrint();
+            try{
+                return transPrint((TransactionPrint) data);
+            }catch (Exception e){
+                e.printStackTrace();
+                return "Error: "+e.getCause();
             }
 
         }else{
@@ -72,13 +70,11 @@ public class PrintHandler {
             }
             return "Printer Failure: "+thermalPrinter.getState();
         }
-
-        return null;
     }
 
-    public void line(){
+    private void line(){
         Log.d(tag,"Printing line");
-        lineBuffer = new byte[96];
+        byte[] lineBuffer = new byte[96];
         for(int index=0;index<54;index++) {
             lineBuffer[index]= (byte) 0xfc;
         }
@@ -86,11 +82,10 @@ public class PrintHandler {
         thermalPrinter.setStep(5);
     }
 
-    public String transPrint(){
+    public String transPrint(TransactionPrint tp){
         Log.d(tag,"Transaction printing...");
 
-        TransactionPrint tp;
-        if(data!=null)
+        if(tp != null)
             tp=(TransactionPrint) data;
         else
             return "Printer Failure: No Data";
@@ -200,7 +195,7 @@ public class PrintHandler {
         thermalPrinter.setStep(200);
 
         thermalPrinter.printStart();
-        state = thermalPrinter.waitForPrintFinish();
+        int state = thermalPrinter.waitForPrintFinish();
 
         Log.v(tag, "Successful transaction Printing: " + state);
 

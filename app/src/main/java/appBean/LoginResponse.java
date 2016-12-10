@@ -1,6 +1,6 @@
 package appBean;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import entities.Logged_in_user;
 

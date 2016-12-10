@@ -8,8 +8,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
@@ -56,13 +58,23 @@
         <service
             android:name="features.CheckTransaction"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
         <service
             android:name="features.LogoutService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
 
-        <activity android:name=".myadmin.SpAdmin"></activity>
+        <activity android:name=".myadmin.SpAdmin" />
+
+        <service
+            android:name="utilities.PeriodicTransactionService"
+            android:exported="false" />
+
+        <receiver
+            android:name="utilities.MyAlarmManager"
+            android:enabled="true"
+            android:process=":remote"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -1,6 +1,6 @@
 package models;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Created by Owner on 5/13/2016.

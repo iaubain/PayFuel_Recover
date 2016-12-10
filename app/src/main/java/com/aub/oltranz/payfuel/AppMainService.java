@@ -552,7 +552,7 @@ public class AppMainService extends Service {
                         long dbId = db.updateTransaction(st);
                         //launch printing procedure
                         PrintHandler ph=new PrintHandler(context,tp);
-                        String print=ph.transPrint();
+                        String print=ph.printOut();//transPrint(tp);
                         if(!print.equalsIgnoreCase("Success")){
                             Log.e(tag,print);
                         }
