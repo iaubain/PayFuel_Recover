@@ -93,12 +93,13 @@ public class PeriodicTransactionService extends IntentService implements PostTra
                 }
                 db.deleteAsyncTransaction(sellingTransaction.getDeviceTransactionId());
             }else if(serverStatus == 301){
-                if(st.getStatus() != 301 || st.getStatus() != 302) {
+                if(st.getStatus() != 301 && st.getStatus() != 302) {
                     st.setStatus(serverStatus);
                     updateLocalTransaction(st);
                 }
             }else if(serverStatus == 500){
                 PaymentMode paymentMode=db.getSinglePaymentMode(sellingTransaction.getPaymentModeId());
+                if(paymentMode != null){
                 if(paymentMode.getName().toLowerCase().contains("tigo") ||
                         paymentMode.getName().toLowerCase().contains("mtn") ||
                         paymentMode.getName().toLowerCase().contains("airtel")){
@@ -107,6 +108,7 @@ public class PeriodicTransactionService extends IntentService implements PostTra
                     db.deleteAsyncTransaction(sellingTransaction.getDeviceTransactionId());
                 }else{
                     db.deleteAsyncTransaction(sellingTransaction.getDeviceTransactionId());
+                }
                 }
             }else{
                 Log.i(tag, "Server status: "+ serverStatus);

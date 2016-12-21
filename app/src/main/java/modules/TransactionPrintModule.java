@@ -34,6 +34,7 @@ public class TransactionPrintModule {
     private class PrintHandler extends AsyncTask<SellingTransaction, String, String> {
 
         SellingTransaction sellingTransaction;
+        DBHelper db = new DBHelper(context);
         @Override
         protected String doInBackground(SellingTransaction... params) {
             sellingTransaction = params[0];
