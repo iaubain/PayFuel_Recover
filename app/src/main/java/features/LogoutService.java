@@ -140,7 +140,7 @@ public class LogoutService extends Service {
                 BufferedReader in1 = new BufferedReader(
                         new InputStreamReader(con.getInputStream()));
                 String inputLine;
-                StringBuffer response = new StringBuffer();
+                StringBuilder response = new StringBuilder();
 
                 while ((inputLine = in1.readLine()) != null) {
                     response.append(inputLine);
@@ -149,13 +149,7 @@ public class LogoutService extends Service {
                 con.disconnect();
                 return response.toString();
 
-            }  catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }catch (Exception e){
+            } catch (Exception e){
                 e.printStackTrace();
             }
 

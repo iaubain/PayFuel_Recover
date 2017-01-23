@@ -210,14 +210,6 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
         }
 
         tHost.setOnTabChangedListener(this);
-
-//        Calendar cal = Calendar.getInstance();
-//        Intent alarmIntent = new Intent(context, AppMainService.class);
-//        PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-//        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//        //clean alarm cache for previous pending intent
-//        alarmCheck.cancel(pintent);
-
     }
 
     // Setup a recurring alarm every 4 sec
@@ -235,22 +227,6 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-
-
-
-
-//        Intent intent = new Intent(this, PeriodicTransactionService.class);
-//        intent.setAction(PeriodicTransactionService.ACTION);
-//        Bundle bundle = new Bundle();
-//        bundle.putInt(PeriodicTransactionService.USER_ID_PARAM, userId);
-//        intent.putExtras(bundle);
-//        PendingIntent pIntent = PendingIntent.getBroadcast(context,
-//                MyAlarmManager.REQUEST_CODE,
-//                intent,
-//                PendingIntent.FLAG_UPDATE_CURRENT);
-//        long firstMillis = System.currentTimeMillis(); // alarm is set right away
-//        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-//        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, 1000*4, pIntent);
     }
 
     public void cancelAlarm() {
@@ -285,7 +261,7 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
         if(!hasPendingTransactions())
             uiPopLogOut();
         else{
-            uiPopUp("There still "+numOfPendingTransaction+" transaction(s) on queue, please wait until are uploaded");
+            uiPopUp("There still "+numOfPendingTransaction+" transaction(s) on queue, please wait until they are uploaded");
         }
     }
 
@@ -300,22 +276,6 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                // User clicked OK button
-                //            DeviceIdentity di=db.getSingleDevice();
-//            LogoutData ld=new LogoutData();
-//            try {
-//                ld.setDevId(di.getDeviceNo());
-//                ld.setUserId(userId);
-//                mc=new MapperClass();
-//
-//                handleUrl=new HandleUrl(this,this,getResources().getString(R.string.logouturl),getResources().getString(R.string.post),mc.mapping(ld));
-//            }catch (Exception e){
-//                uiFeedBack(e.getMessage());
-//            }
-
-
-                //unregisterReceiver(broadcastReceiver);
-
                 Intent logoutIntent=new Intent(getApplicationContext(), LogoutService.class);
                 Bundle logotBundle=new Bundle();
                 logotBundle.putInt("userId",userId);
@@ -350,60 +310,6 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
         });
         AlertDialog dialog = builder.create();
         dialog.show();
-
-//
-//        if (doubleBackToExitPressedOnce) {
-////            DeviceIdentity di=db.getSingleDevice();
-////            LogoutData ld=new LogoutData();
-////            try {
-////                ld.setDevId(di.getDeviceNo());
-////                ld.setUserId(userId);
-////                mc=new MapperClass();
-////
-////                handleUrl=new HandleUrl(this,this,getResources().getString(R.string.logouturl),getResources().getString(R.string.post),mc.mapping(ld));
-////            }catch (Exception e){
-////                uiFeedBack(e.getMessage());
-////            }
-//
-//
-//            //unregisterReceiver(broadcastReceiver);
-//
-//            Intent logoutIntent=new Intent(this, LogoutService.class);
-//            Bundle logotBundle=new Bundle();
-//            logotBundle.putInt("userId",userId);
-//            DeviceIdentity di=db.getSingleDevice();
-//            logotBundle.putString("deviceNo",di.getDeviceNo());
-//
-//            logoutIntent.putExtras(logotBundle);
-//
-//            this.startService(logoutIntent);
-//
-//
-//            Calendar cal = Calendar.getInstance();
-//            Intent alarmIntent = new Intent(context, CheckTransaction.class);
-//            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-//            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//            //clean alarm cache for previous pending intent
-//            alarm.cancel(pintent);
-//
-//            intent=new Intent(this,Home.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//            finish();
-//            startActivity(intent);
-//
-//            return;
-//        }
-//
-//        this.doubleBackToExitPressedOnce = true;
-//        Toast.makeText(this, "Please click Logout again to exit", Toast.LENGTH_SHORT).show();
-//
-//        new Handler().postDelayed(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                doubleBackToExitPressedOnce = false;
-//            }
-//        }, 2000);
     }
 
     private boolean hasPendingTransactions(){
@@ -445,36 +351,12 @@ public class SellingTabHost extends TabActivity implements TabHost.OnTabChangeLi
                     dialog.dismiss();
 
                     try{
-//                        List<AsyncTransaction> asyncTransactionsTemp = new ArrayList<AsyncTransaction>();
-//                        List<AsyncTransaction> asyncTransactionList = db.getAllAsyncTransactions(userId);
-//                        for(AsyncTransaction asyncTransaction : asyncTransactionList){
-//                            SellingTransaction sellingTransaction = db.getSingleTransaction(asyncTransaction.getDeviceTransactionId());
-//                            PaymentMode paymentMode = db.getSinglePaymentMode(sellingTransaction.getPaymentModeId());
-//
-//                            if(paymentMode.getName().toLowerCase().contains("tigo") || paymentMode.getName().toLowerCase().contains("mtn") || paymentMode.getName().toLowerCase().contains("airtel")){
-//                                if(asyncTransaction.getSum() <= 40){
-//                                    db.deleteAsyncTransaction(asyncTransaction.getDeviceTransactionId());
-//                                    if(sellingTransaction.getStatus() != 100){
-//                                        sellingTransaction.setStatus(500);
-//                                        db.updateTransaction(sellingTransaction);
-//                                    }
-//                                }else
-//                                    asyncTransactionsTemp.add(asyncTransaction);
-//                            }else
-//                                asyncTransactionsTemp.add(asyncTransaction);
-//                        }
-//
                         Intent i = new Intent(context, PeriodicTransactionService.class);
                         i.setAction(PeriodicTransactionService.ACTION);
                         Bundle bundle1 = new Bundle();
                         bundle1.putInt(PeriodicTransactionService.USER_ID_PARAM, userId);
                         i.putExtras(bundle1);
                         context.startService(i);
-
-//                        if(!asyncTransactionsTemp.isEmpty()){
-//                            ClearPending clearPending = new ClearPending(SellingTabHost.this, db.getAllAsyncTransactions(userId), db);
-//                            clearPending.startClearing();
-//                        }
                     }catch (Exception e){
                         e.printStackTrace();
                     }

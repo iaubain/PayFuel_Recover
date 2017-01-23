@@ -55,10 +55,18 @@ public class PeriodicTransactionService extends IntentService implements PostTra
     }
 
     private void startPosting(AsyncTransaction asyncTransaction){
-        SellingTransaction sellingTransaction = db.getSingleTransaction(asyncTransaction.getDeviceTransactionId());
-        if(sellingTransaction != null){
-            PostTransaction postTransaction = new PostTransaction(PeriodicTransactionService.this, sellingTransaction);
-            postTransaction.startPosting();
+        try{
+            SellingTransaction sellingTransaction = db.getSingleTransaction(asyncTransaction.getDeviceTransactionId());
+            if(sellingTransaction != null){
+                if(sellingTransaction.getQuantity() != null && sellingTransaction.getQuantity() != 0){
+                    PostTransaction postTransaction = new PostTransaction(PeriodicTransactionService.this, sellingTransaction);
+                    postTransaction.startPosting();
+                }else{
+                    db.deleteAsyncTransaction(sellingTransaction.getDeviceTransactionId());
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 

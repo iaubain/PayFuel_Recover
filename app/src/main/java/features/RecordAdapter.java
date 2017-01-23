@@ -1,12 +1,15 @@
 package features;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,80 +31,104 @@ public class RecordAdapter extends ArrayAdapter<SellingTransaction> implements T
     String tag="PayFuel: "+getClass().getSimpleName();
     private final Activity context;
     private final int userId;
-    DBHelper db;
+    private DBHelper db;
     private final List<SellingTransaction> sts;
+    private RecordAdapterInteraction mListener;
 
-    public RecordAdapter(Activity context, int userId, List<SellingTransaction> sts) {
+    public RecordAdapter(RecordAdapterInteraction mListener, Activity context, int userId, List<SellingTransaction> sts) {
         super(context, R.layout.record_style, sts);
         Log.d(tag, "Construct Transaction List Adapter");
 
         this.context=context;
+        this.mListener=mListener;
         this.userId=userId;
         this.sts=sts;
         db=new DBHelper(context);
     }
 
-    public View getView(int position,View view,ViewGroup parent) {
+    @NonNull
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         Log.d(tag, "Transaction Row " + position + " Default Values Handle");
-        LayoutInflater inflater=context.getLayoutInflater();
-        View rowView=inflater.inflate(R.layout.record_style, null, true);
+        View row = convertView;
+        ViewHolder holder;
+        if (row == null) {
+            LayoutInflater inflater = (context).getLayoutInflater();
+            row = inflater.inflate(R.layout.record_style, parent, false);
+            holder = new ViewHolder();
+
+            holder.transId=(TextView) row.findViewById(R.id.transid);
+            holder.prodInfo=(TextView) row.findViewById(R.id.prodinfo);
+            holder.payInfo=(TextView) row.findViewById(R.id.payinfo);
+            holder.refresh = (ImageView) row.findViewById(R.id.refresh);
+            holder.print=(Button) row.findViewById(R.id.print);
+            row.setTag(holder);
+        } else {
+            holder = (ViewHolder) row.getTag();
+        }
 
         final SellingTransaction st= sts.get(position);
 
-        TextView transId=(TextView) rowView.findViewById(R.id.transid);
-        TextView prodInfo=(TextView) rowView.findViewById(R.id.prodinfo);
-        TextView payInfo=(TextView) rowView.findViewById(R.id.payinfo);
-
-        final Button print=(Button) rowView.findViewById(R.id.print);
-
-        transId.setText(String.valueOf(st.getDeviceTransactionId()));
+        holder.transId.setText(String.valueOf(st.getDeviceTransactionId()));
         String prodName="product";
         Nozzle nozzle=db.getSingleNozzle(st.getNozzleId());
         if(nozzle != null && nozzle.getProductName() != null)
             prodName=db.getSingleNozzle(st.getNozzleId()).getProductName();
 
-        prodInfo.setText(db.getSingleNozzle(st.getNozzleId()).getNozzleName()+" /"+prodName+" /"+st.getQuantity()+"L /"+st.getPlateNumber());
+        holder.prodInfo.setText(db.getSingleNozzle(st.getNozzleId()).getNozzleName()+" /"+prodName+" /"+st.getQuantity()+"L /"+st.getPlateNumber());
       //  prodInfo.setText(prodName+" /"+qty+"L /"+plate);
         if(st.getStatus()==100 || st.getStatus()==101){
-            payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Succeeded");
-            payInfo.setTextColor(context.getResources().getColor(R.color.positive));
+            holder.payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Succeeded");
+            holder.payInfo.setTextColor(ContextCompat.getColor(context, R.color.positive));
         }
         else if(st.getStatus()==301 || st.getStatus()==302){
-            payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Pending");
-            payInfo.setTextColor(context.getResources().getColor(R.color.tab_highlight));
+            holder.payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Pending");
+            holder.payInfo.setTextColor(ContextCompat.getColor(context, R.color.tab_highlight));
 
-            print.setEnabled(false);
-            print.setClickable(false);
-            print.setBackground(context.getResources().getDrawable(R.drawable.button_shape_negative));
-            print.setTextColor(context.getResources().getColor(R.color.nearblack));
+            holder.print.setEnabled(false);
+            holder.print.setClickable(false);
+            holder.print.setBackground(ContextCompat.getDrawable(context,R.drawable.button_shape_negative));
+            holder.print.setTextColor(ContextCompat.getColor(context, R.color.nearblack));
         }else{
-            payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Failed");
-            payInfo.setTextColor(context.getResources().getColor(R.color.error));
+            holder.payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Failed");
+            holder.payInfo.setTextColor(ContextCompat.getColor(context, R.color.error));
 
-            print.setEnabled(false);
-            print.setClickable(false);
-            print.setBackground(context.getResources().getDrawable(R.drawable.button_shape_negative));
-            print.setTextColor(context.getResources().getColor(R.color.nearblack));
+            holder.print.setEnabled(false);
+            holder.print.setClickable(false);
+            holder.print.setBackground(ContextCompat.getDrawable(context, R.drawable.button_shape_negative));
+            holder.print.setTextColor(ContextCompat.getColor(context, R.color.nearblack));
         }
 
         if(st.getStatus()==500){
-            print.setEnabled(false);
-            print.setClickable(false);
-            print.setBackground(context.getResources().getDrawable(R.drawable.button_shape_negative));
-            print.setTextColor(context.getResources().getColor(R.color.nearblack));
+            holder.print.setEnabled(false);
+            holder.print.setClickable(false);
+            holder.print.setBackground(ContextCompat.getDrawable(context, R.drawable.button_shape_negative));
+            holder.print.setTextColor(ContextCompat.getColor(context, R.color.nearblack));
         }
 
-        print.setOnClickListener(new View.OnClickListener() {
+        holder.refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                printAction(st.getDeviceTransactionId());
+                refreshTransaction(st);
             }
         });
-        return rowView;
+
+        holder.print.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                printAction(st);
+            }
+        });
+        return row;
     }
 
-    public void printAction(final long traId){
-        final SellingTransaction st=db.getSingleTransaction(traId);
+    private void refreshTransaction(SellingTransaction sellingTransaction){
+        if(sellingTransaction != null)
+            mListener.onRecordInteractionRefresh(true, sellingTransaction);
+        else
+            uiFeedBack("Empty Transaction");
+    }
+
+    private void printAction(SellingTransaction st){
 
         if(st.getStatus() == 100){
             try{
@@ -114,12 +141,25 @@ public class RecordAdapter extends ArrayAdapter<SellingTransaction> implements T
         }
     }
 
-    public void uiFeedBack(String message){
+    private void uiFeedBack(String message){
         Toast.makeText(context, message , Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void printResult(String printingMessage) {
         uiFeedBack(printingMessage);
+    }
+
+
+    private static class ViewHolder {
+        TextView transId;
+        TextView prodInfo;
+        TextView payInfo;
+        ImageView refresh;
+        Button print;
+    }
+
+    public interface RecordAdapterInteraction {
+        void onRecordInteractionRefresh(boolean refresh, SellingTransaction sellingTransaction);
     }
 }

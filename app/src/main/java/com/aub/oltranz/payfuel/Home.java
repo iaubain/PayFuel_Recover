@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -39,8 +40,10 @@ import features.LoadPumps;
 import features.ServiceCheck;
 import features.ThreadControl;
 import models.MapperClass;
+import modules.LoginManager;
+import modules.ResourceManager;
 
-public class Home extends ActionBarActivity implements HandleUrlInterface {
+public class Home extends AppCompatActivity implements LoginManager.LoginManagerInteraction, ResourceManager.ResourceManagerInteraction {
     String tag = "PayFuel: " + getClass().getSimpleName();
 
     TextView tv;
@@ -55,7 +58,6 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
     MapperClass mapperClass;
     DBHelper db;
     HandleUrl hu;
-    LoadPumps lp;
     LoadPaymentMode lpm;
 
     Intent intent;
@@ -135,8 +137,7 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
             uiFeedBack(getResources().getString(R.string.invaliddata));
         } else {
             //process the login
-            DeviceIdentity di = new DeviceIdentity();
-            di = db.getSingleDevice();
+            DeviceIdentity di = db.getSingleDevice();
             Login login = new Login();
             login.setDeviceId(di.getDeviceNo());
             login.setUserPin(pin.getText().toString());
@@ -145,9 +146,8 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
             disableUI();
 
             //mapping to object to get JsonData
-            String jsonData = mapperClass.mapping(login);
-            hu = new HandleUrl(this, context, getResources().getString(R.string.loginurl), getResources().getString(R.string.post), jsonData);
-
+            LoginManager loginManager = new LoginManager(Home.this, login);
+            loginManager.loginRequest();
         }
     }
 
@@ -223,220 +223,6 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
         }
     }
 
-    @Override
-    public void resultObject(Object object) {
-        if (object == null) {
-            uiFeedBack(getResources().getString(R.string.connectionerror));
-        } else {
-            //uiFeedBack("Objected to: " + object.getClass().getSimpleName());
-            if (object.getClass().getSimpleName().equalsIgnoreCase("LoginResponse")) {
-                LoginResponse lr = (LoginResponse) object;
-                if (lr.getStatusCode() != 100) {
-                    //when login response got a problem
-                    uiFeedBack(getResources().getString(R.string.loginproblem)+" "+lr.getMessage());
-                } else {
-                    //when the status code is Okay
-                    //check the logged users
-                    int userCount = db.getUserCount();
-                    if (userCount > 0) {
-                        //when user(s) is(are) found
-                        int currentUserId = lr.getLogged_in_user().getUser_id();
-                        List<Logged_in_user> users = db.getAllUsers();
-
-                        forceLogoutUser(users, currentUserId);
-//                        if(!forceLogoutUser(users,currentUserId)){
-//                            resetLogin();
-//                            uiFeedBack("Force logout the fore loggedIn Falied");
-//                        }
-
-                        if (isUserLogged(users, currentUserId)) {
-                            //user found in local database
-                            Logged_in_user logged = lr.getLogged_in_user();
-                            logged = db.getSingleUser(logged.getUser_id());
-                            userId = logged.getUser_id();
-                            branchId = logged.getBranch_id();
-                            //uiFeedBack("Success: " + userId);
-
-                            //_______________Return him back to Select pump_nozzles Page_______________\\
-                            int pumpCount = db.getPumpCount();
-                            if (pumpCount > 0) {
-                                int nozzleCount = db.getNozzleCount();
-                                if (nozzleCount > 0) {
-                                    int selectedPumpCount = db.getStatusCountByUser(userId);
-                                    if (selectedPumpCount <= 0) {
-                                        //continue with normal login
-                                        if (loadPumps(this, userId)) {
-                                            //loading payment
-                                            // pause();
-                                            if (loadPayment(this, userId)) {
-
-                                                intent = new Intent(context, SelectPumps.class);
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString(getResources().getString(R.string.userid), String.valueOf(userId));
-                                                intent.putExtras(bundle);
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                                dismissDialog();
-                                                finish();
-                                                startActivity(intent);
-                                            } else {
-                                                resetLogin();
-                                                uiFeedBack("Loading paymentMode failed");
-                                            }
-                                        } else {
-                                            resetLogin();
-                                            uiFeedBack("Loading pumps failed");
-                                        }
-                                    } else {
-
-                                                intent = new Intent(context, SellingTabHost.class);
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString(getResources().getString(R.string.userid), String.valueOf(userId));
-                                                intent.putExtras(bundle);
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                                dismissDialog();
-                                                finish();
-                                                startActivity(intent);
-
-                                    }
-                                } else {
-                                    resetLogin();
-                                    uiFeedBack(getResources().getString(R.string.loginproblem));
-                                }
-                            } else {
-                                resetLogin();
-                                uiFeedBack(getResources().getString(R.string.loginproblem));
-                            }
-//                            //loading pumps if necessary
-//                            if(loadPumps(this,userId)){
-//                                uiFeedBack("Loading pumps succeeded : "+userId);
-//                            }else{
-//                                uiFeedBack("Loading pumps failed: ");
-//                            }
-
-                        } else {
-                            //if user was not found in local database or its status is 0 in local database
-                            Logged_in_user logged = lr.getLogged_in_user();
-                            logged.setLogged(0);
-
-                            //Delete user if already there in the database
-                            db.deleteUser(logged.getUser_id());
-
-                            //create a user which is logging in
-                            long internalId = db.createUser(logged);
-                            if (internalId <= 0) {
-                                //when to register a user on local device failed
-                                uiFeedBack(getResources().getString(R.string.loginproblem));
-                            } else {
-                                //when registering a user on local device succeeded
-                                userId = logged.getUser_id();
-                                branchId = logged.getBranch_id();
-                                //uiFeedBack("Login Success: " + userId);
-                                //pause();
-
-                                if (loadPumps(this, userId)) {
-                                    //loading payment
-                                    // pause();
-                                    if (loadPayment(this, userId)) {
-                                        // Redirect the use to sale page
-                                       // showDialog("Logging In. Done...");
-
-//                                        ServiceCheck sc=new ServiceCheck(this);
-//                                        if(!sc.isMyServiceRunning(AppMainService.class)){
-//                                            Calendar cal = Calendar.getInstance();
-//                                            Intent alarmIntent = new Intent(context, AppMainService.class);
-//                                            PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-//                                            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//                                            //clean alarm cache for previous pending intent
-//                                            alarm.cancel(pintent);
-//                                            // schedule for every 4 seconds
-//                                            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-//                                        }
-
-                                        intent = new Intent(context, SelectPumps.class);
-                                        Bundle bundle = new Bundle();
-                                        bundle.putString(getResources().getString(R.string.userid), String.valueOf(userId));
-                                        intent.putExtras(bundle);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                        dismissDialog();
-                                        finish();
-                                        startActivity(intent);
-
-                                    } else {
-                                        resetLogin();
-                                        uiFeedBack("Loading paymentMode failed");
-                                    }
-                                } else {
-                                    resetLogin();
-                                    uiFeedBack("Loading pumps failed");
-                                }
-                            }
-                        }
-                    } else {
-                        //if user was not found in local database or its status is 0 in local database
-                        Logged_in_user logged = lr.getLogged_in_user();
-                        logged.setLogged(0);
-
-                        //Delete user if already there in the database
-                        //db.deleteUser(logged.getUser_id());
-
-                        //create a user which is logging in
-                        long internalId = db.createUser(logged);
-                        if (internalId <= 0) {
-                            //when to register a user on local device failed
-                            resetLogin();
-                            uiFeedBack(getResources().getString(R.string.loginproblem));
-                        } else {
-                            //when registering a user on local device succeeded
-                            userId = logged.getUser_id();
-                            branchId = logged.getBranch_id();
-                            //uiFeedBack("Login Success: " + userId);
-                            //pause();
-
-                            if (loadPumps(this, userId)) {
-                                //loading payment
-                                // pause();
-                                if (loadPayment(this, userId)) {
-                                    // Redirect the use to sale page
-                                   // showDialog("Logging In. Done...");
-
-//                                    ServiceCheck sc=new ServiceCheck(this);
-//                                    if(!sc.isMyServiceRunning(AppMainService.class)){
-//                                        Calendar cal = Calendar.getInstance();
-//                                        Intent alarmIntent = new Intent(context, AppMainService.class);
-//                                        PendingIntent pintent = PendingIntent.getService(context, 0, alarmIntent, 0);
-//                                        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//                                        //clean alarm cache for previous pending intent
-//                                        alarm.cancel(pintent);
-//                                        // schedule for every 4 seconds
-//                                        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 4 * 1000, pintent);
-//                                    }
-
-                                    intent = new Intent(context, SelectPumps.class);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString(getResources().getString(R.string.userid), String.valueOf(userId));
-                                    intent.putExtras(bundle);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                    dismissDialog();
-                                    finish();
-                                    startActivity(intent);
-                                } else {
-                                    resetLogin();
-                                    uiFeedBack("Loading paymentMode failed");
-                                }
-                            } else {
-                                resetLogin();
-                                uiFeedBack("Loading pumps failed");
-                            }
-                        }
-                    }
-
-                }
-            } else {
-                resetLogin();
-                uiFeedBack(getResources().getString(R.string.ambiguous));
-            }
-        }
-    }
 
     //resetting the login when a bad login happens
     public void resetLogin(){
@@ -451,11 +237,6 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
         Log.v(tag,"User log status 0: "+log);
         db.deleteUser(userId);
         db.deleteStatusByUser(userId);
-    }
-
-    @Override
-    public void feedBack(String message) {
-        uiFeedBack(message);
     }
 
     //Disabling all UI element
@@ -527,13 +308,6 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
         }
     }
 
-    public boolean loadPumps(Context context, int userId) {
-       // updateDialog("Logging In. Loading pumps...");
-        lp = new LoadPumps();
-        return lp.fetchPump(context, userId);
-
-    }
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
        if(keyCode == KeyEvent.KEYCODE_BACK){
@@ -554,29 +328,6 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
             Log.e(tag, "Application Paused attempt failed");
             e.printStackTrace();
         }
-//        Thread closeActivity = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Log.e(tag, "Application Paused for 3 seconds");
-//                    Thread.sleep(3000);
-//                } catch (Exception e) {
-//                    e.getLocalizedMessage();
-//                }
-//            }
-//        });
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.e(tag, "Application resumed");
-////                onResume();
-//                tc.resume();
-//            }
-//        }, 3000);
-//        Log.e(tag, "Application Paused for 3 seconds");
-////        onPause();
-//        tc.pause();
     }
 
     public boolean loadPayment(Context context, int userId) {
@@ -694,14 +445,6 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        if(! progress.isShowing()){
-//            TextView title=(TextView) progress.findViewById(R.id.progresstitle);
-//            title.setText(message);
-//            progress.show();
-//        }else{
-//            TextView title=(TextView) progress.findViewById(R.id.progresstitle);
-//            title.setText(message);
-//        }
     }
 
 
@@ -712,5 +455,48 @@ public class Home extends ActionBarActivity implements HandleUrlInterface {
 
     public void launchBarDialog(View view) {
 
+    }
+
+    @Override
+    public void onLoginManagerInteraction(boolean isLoginSuccessFull, String message, Logged_in_user user) {
+        if(!isLoginSuccessFull){
+            uiFeedBack(message);
+            return;
+        }
+        if(user == null){
+            uiFeedBack(message);
+            return;
+        }
+
+        //check user if was available, load pumps, force logout the
+        ResourceManager resourceManager = new ResourceManager(Home.this, Home.this, user);
+        resourceManager.organizeResources();
+    }
+
+    @Override
+    public void onResourceAvailable(boolean isUserAllowed, String message, Logged_in_user user) {
+        if(isUserAllowed){
+            //direct him to sales activity
+        }else{
+            //show the message
+        }
+    }
+
+    @Override
+    public void onUiLoading(boolean loading, String message, Logged_in_user user) {
+        if(loading){
+            //show loading message to progress dialog
+        }else{
+            //uiFeed the message again
+        }
+    }
+
+    @Override
+    public void onSelectPumps(boolean selectPumps, String message, Logged_in_user user) {
+        if(selectPumps){
+            //direct the user to select pumps activities
+        }else{
+            //show the message
+        }
     }
 }

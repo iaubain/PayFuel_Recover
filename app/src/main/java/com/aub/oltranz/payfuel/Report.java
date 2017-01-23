@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.StrictMode;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aub.oltranz.payfuel.myadmin.SpAdmin;
 
@@ -27,14 +29,16 @@ import java.util.List;
 import java.util.Locale;
 
 import databaseBean.DBHelper;
+import entities.AsyncTransaction;
 import entities.Logged_in_user;
 import entities.Nozzle;
 import entities.PaymentMode;
 import entities.SellingTransaction;
 import features.PrintReport;
 import features.RecordAdapter;
+import modules.PostTransaction;
 
-public class Report extends ActionBarActivity {
+public class Report extends AppCompatActivity implements RecordAdapter.RecordAdapterInteraction, PostTransaction.PostTransactionInteraction {
 
     String tag="PayFuel: "+getClass().getSimpleName();
     int userId;
@@ -50,6 +54,7 @@ public class Report extends ActionBarActivity {
     DBHelper db;
     boolean yesterdayReport = false;
     List<SellingTransaction> sts;
+    private ListView transView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +126,7 @@ public class Report extends ActionBarActivity {
 
         final TextView tv=(TextView) dialog.findViewById(R.id.popupTv);
         Button exit=(Button) dialog.findViewById(R.id.done);
-        final ListView transView=(ListView) dialog.findViewById(R.id.records);
+        transView=(ListView) dialog.findViewById(R.id.records);
 
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,28 +141,8 @@ public class Report extends ActionBarActivity {
             e.printStackTrace();
             tv.setText(e.getMessage());
         }
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.v(tag,"Loading Transaction Logs");
-                try{
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<SellingTransaction> sts = db.getAllTransactionsPerUser(userId);
-                            RecordAdapter ra = new RecordAdapter((Activity) context, userId, sts);
-                            transView.setAdapter(ra);
-                        }
-                    });
-
-                }catch (Exception e){
-                    tv.setText("Error Occured");
-                    e.printStackTrace();
-                }
-            }
-        };
-        new Thread(runnable).start();
+        TransactionLogs logs = new TransactionLogs();
+        logs.execute(userId);
 
 
         dialog.show();
@@ -497,4 +482,127 @@ private void showReport(final Dialog dialog, int repportDate, List<SellingTransa
         }
         return super.onKeyDown(keyCode, event);
     }
+
+    @Override
+    public void onRecordInteractionRefresh(boolean refresh, SellingTransaction sellingTransaction) {
+        if(dialog != null)
+            if(dialog.isShowing())
+                dialog.dismiss();
+        if(refresh && sellingTransaction != null){
+            //refresh a transaction
+            PostTransaction postTransaction = new PostTransaction(Report.this, sellingTransaction);
+            postTransaction.startPosting();
+        }
+    }
+
+    @Override
+    public void onTransactionPost(boolean status, int serverStatus, SellingTransaction sellingTransaction) {
+        if(status){
+            SellingTransaction st = db.getSingleTransaction(sellingTransaction.getDeviceTransactionId());
+            if(serverStatus == 100 && st.getStatus() != 100){
+                incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
+                AsyncTransaction asyncTransaction = db.getSingleAsyncPerTransacton(st.getDeviceTransactionId());
+                if(asyncTransaction != null)
+                    db.deleteAsyncTransaction(st.getDeviceTransactionId());
+            }
+            if(st.getStatus() != 100){
+                st.setStatus(serverStatus);
+                updateLocalTransaction(st);
+            }
+        }else{
+            switch(serverStatus){
+                case PostTransaction.CONNECTIVITY_ERROR :
+                    Toast.makeText(getApplicationContext(), "CONNECTIVITY ERROR", Toast.LENGTH_LONG).show();
+                    break;
+                case PostTransaction.LOCAL_ERROR :
+                    Toast.makeText(getApplicationContext(), "LOCAL TRANSACTION ERROR", Toast.LENGTH_LONG).show();
+                    break;
+                case PostTransaction.SERVER_ERROR :
+                    Toast.makeText(getApplicationContext(), "SERVER ERROR", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    }
+
+    private void updateLocalTransaction(SellingTransaction sellingTransaction){
+        try{
+            db.updateTransaction(sellingTransaction);
+
+            PaymentMode paymentMode = db.getSinglePaymentMode(sellingTransaction.getPaymentModeId());
+            if(paymentMode.getName().toLowerCase().contains("tigo") || paymentMode.getName().toLowerCase().contains("mtn") || paymentMode.getName().toLowerCase().contains("airtel")){
+                AsyncTransaction asyncTransaction = db.getSingleAsyncPerTransacton(sellingTransaction.getDeviceTransactionId());
+                if(asyncTransaction != null){
+                    if(asyncTransaction.getSum() >= 40){
+                        sellingTransaction.setStatus(500);
+                        db.updateTransaction(sellingTransaction);
+                        db.deleteAsyncTransaction(asyncTransaction.getDeviceTransactionId());
+                    }else{
+                        asyncTransaction.setSum(asyncTransaction.getSum()+1);
+                        db.updateAsyncTransaction(asyncTransaction);
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "ERROR: "+e.getCause(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void incrementIndex(Nozzle nozzle, Double addValue){
+        Log.d("Nozzle","Updating nozzle: "+nozzle.getNozzleId()+"'s Indexes");
+        Double newIndex=nozzle.getNozzleIndex()+addValue;
+        nozzle.setNozzleIndex(newIndex);
+        long dbId=db.updateNozzle(nozzle);
+        Log.v("Nozzle","Nozzle "+dbId+" Updated");
+        Log.v("Nozzle", "Synchronisation finished, Sending a refresh Broadcast Command");
+        Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg",
+                "refresh_processTransaction");
+        getApplicationContext().sendBroadcast(i);
+    }
+
+
+    private class TransactionLogs extends AsyncTask<Integer, Object, List<SellingTransaction>> {
+
+        List<SellingTransaction> transactionList;
+        int localUserId;
+        DBHelper db = new DBHelper(context);
+        @Override
+        protected List<SellingTransaction> doInBackground(Integer... params) {
+            localUserId = params[0];
+            transactionList = new ArrayList<>();
+            try{
+                return transactionList =  db.getAllTransactionsPerUser(localUserId);
+            }catch (Exception e){
+                e.printStackTrace();
+                return transactionList;
+            }
+
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(List<SellingTransaction> result) {
+            if(result.isEmpty()){
+                Toast.makeText(Report.this, "No transaction found", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            RecordAdapter ra = new RecordAdapter(Report.this, (Activity) context, userId, result);
+            transView.setAdapter(ra);
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Object... text) {
+
+        }
+    }
+
 }

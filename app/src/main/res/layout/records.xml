@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/nozzlelayout"
-    android:orientation="vertical"
+    android:background="@color/appWhite"
     android:padding="4dp"
     tools:context="com.aub.oltranz.payfuel.Report">
 
@@ -21,23 +21,22 @@
         android:id="@+id/popupTv"
         android:layout_gravity="center_horizontal"/>
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/popupTv"
-        android:layout_marginBottom="52dp"
-        android:layout_centerHorizontal="true">
+
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/popupTv"
+            android:layout_above="@+id/bottomBlock"
             android:id="@+id/records"
             android:listSelector="@color/transparent"
             android:layout_gravity="center_horizontal" />
 
-    </TableRow>
+
 
     <TableRow
+        android:id="@+id/bottomBlock"
+        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

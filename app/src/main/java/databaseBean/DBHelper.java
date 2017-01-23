@@ -450,7 +450,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
-            while (c.isAfterLast() == false){
+            while (!c.isAfterLast()){
                 SellingTransaction st = new SellingTransaction();
                 st.setDeviceTransactionId(c.getLong(c.getColumnIndex(transactionId)));
                 st.setNozzleId(c.getInt(c.getColumnIndex(nozzleId)));
@@ -462,7 +462,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 st.setTin(c.getString(c.getColumnIndex(tin)));
                 st.setVoucherNumber(c.getString(c.getColumnIndex(voucherNumber)));
                 st.setAuthorisationCode(c.getString(c.getColumnIndex(authorisationCode)));
-                st.setDeviceTransactionTime(c.getString(c.getColumnIndex(time)).toString());
+                st.setDeviceTransactionTime(c.getString(c.getColumnIndex(time)));
                 st.setAuthenticationCode(c.getInt(c.getColumnIndex(authenticationCode)));
                 st.setDeviceNo(c.getString(c.getColumnIndex(deviceId)));
                 st.setStatus(c.getInt(c.getColumnIndex(status)));
@@ -477,6 +477,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 c.moveToNext();
             }
         }
+        c.close();
 
         return sts;
     }
@@ -523,7 +524,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 c.moveToNext();
             }
         }
-
+        c.close();
         return sts;
     }
 
@@ -566,7 +567,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
-            while (c.isAfterLast() == false){
+            while (!c.isAfterLast()){
                 SellingTransaction st = new SellingTransaction();
                 st.setDeviceTransactionId(c.getLong(c.getColumnIndex(transactionId)));
                 st.setNozzleId(c.getInt(c.getColumnIndex(nozzleId)));
@@ -593,7 +594,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 c.moveToNext();
             }
         }
-
+        c.close();
         Log.v(tag,"Size of transaction report: "+sts.size());
         return sts;
     }
@@ -605,6 +606,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void deleteTransaction(long t_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(transactionTable, transactionId + " = ?", new String[]{String.valueOf(t_id)});
+        db.close();
     }
 
     /**
@@ -614,6 +616,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String sql = "DELETE FROM "+transactionTable+" WHERE "+time+" <= date('now','-6 day')";
         db.execSQL(sql);
+        db.close();
     }
 
     /**
@@ -626,7 +629,9 @@ public class DBHelper extends SQLiteOpenHelper {
         // updating row
         ContentValues value = new ContentValues();
         value.put("seq", 0);
-        return db.update("SQLITE_SEQUENCE", value, "name" + " = ?", new String[]{transactionTable});
+        int valueToReturn = db.update("SQLITE_SEQUENCE", value, "name" + " = ?", new String[]{transactionTable});
+        db.close();
+        return valueToReturn;
     }
 
     /**
@@ -643,6 +648,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getCount();
         cursor.close();
         // return count
+        db.close();
         return count;
     }
     /**
@@ -658,6 +664,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getCount();
         cursor.close();
         // return count
+        db.close();
         return count;
     }
 
@@ -674,6 +681,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getCount();
         cursor.close();
         // return count
+        db.close();
         return count;
     }
 
@@ -690,6 +698,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getCount();
         cursor.close();
         // return count
+        db.close();
         return count;
     }
 
@@ -700,19 +709,11 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-//        values.put(transactionId, st.getDeviceTransactionId());
-//        values.put(amount,st.getAmount());
-//        values.put(quantity,st.getQuantity());
-//        values.put(plateNumber,st.getPaymentModeId());
-//        values.put(telephone,st.getTelephone());
-//        values.put(customerName,st.getName());
-//        values.put(tin, st.getTin());
-//        values.put(voucherNumber,st.getVoucherNumber());
-//        values.put(authorisationCode, st.getAuthorisationCode());
-//        values.put(authenticationCode, st.getAuthenticationCode());
         values.put(status,st.getStatus());
         // updating row
-        return db.update(transactionTable, values, transactionId + " = ?", new String[]{String.valueOf(st.getDeviceTransactionId())});
+        int valueToReturn = db.update(transactionTable, values, transactionId + " = ?", new String[]{String.valueOf(st.getDeviceTransactionId())});
+        db.close();
+        return valueToReturn;
     }
 
 
@@ -733,6 +734,7 @@ public class DBHelper extends SQLiteOpenHelper {
         // insert row
         long pumpId = db.insertWithOnConflict(pumpTable, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
+        db.close();
         return pumpId;
     }
 
@@ -754,8 +756,12 @@ public class DBHelper extends SQLiteOpenHelper {
             pump.setBranchId(c.getInt(c.getColumnIndex(branchId)));
             pump.setStatus(c.getInt(c.getColumnIndex(pumpStatus)));
 
+            c.close();
+            db.close();
             return pump;
         }
+
+        db.close();
         return null;
     }
 
@@ -1665,20 +1671,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
-            while(c.isAfterLast() == false){
+            while(!c.isAfterLast()){
 //                WorkStatus ws=new WorkStatus();
 
                 if(c.getInt(c.getColumnIndex(statusCode))==2)
                     return true;
-//                ws.setStatusId(c.getInt(c.getColumnIndex(statusId)));
-//                ws.setUserId(c.getInt(c.getColumnIndex(userId)));
-//                ws.setStatusCode(c.getInt(c.getColumnIndex(statusCode)));
-//                ws.setPumpId(c.getInt(c.getColumnIndex(pumpId)));
-//                ws.setNozzleId(c.getInt(c.getColumnIndex(nozzleId)));
-//                ws.setMessage(c.getString(c.getColumnIndex(statusMessage)));
-//
-//                // adding Status to list
-//                statuses.add(ws);
                 c.moveToNext();
             }
         }

@@ -23,13 +23,17 @@
                     android:textSize="18sp"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="TransactionId"
-                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:maxLength="20"
                     android:ellipsize="marquee"
                     android:id="@+id/transid" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="10sp"
+                    android:maxLines="1"
+                    android:maxLength="30"
+                    android:ellipsize="end"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Product Info"
                     android:id="@+id/prodinfo" />
@@ -37,6 +41,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="10sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Payinfo"
                     android:id="@+id/payinfo" />
@@ -55,6 +61,18 @@
             android:textColor="@drawable/text_button_positive"
             android:textStyle="bold"
             android:background="@drawable/ic_action_positive"/>
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_refresh"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:tint="@color/colorGreen"
+            android:id="@+id/refresh"
+            android:layout_centerVertical="true"
+            android:layout_alignTop="@+id/print"
+            android:layout_toStartOf="@+id/print" />
     </RelativeLayout>
 
 </LinearLayout>
