@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.mysppayfuel.R;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -126,7 +126,7 @@ public class TransactionProcess implements HandleUrlInterface {
                         //Increment nozzles' index
                         Nozzle nozzle=new Nozzle();
                         nozzle=db.getSingleNozzle(st.getNozzleId());
-                        incrementIndex(st.getNozzleId(), nozzle.getNozzleIndex(),st.getQuantity());
+//                        incrementIndex(st.getNozzleId(), nozzle.getNozzleIndex(),st.getQuantity());
 
                         if(stLocal.getStatus()==302){
                             //if the receipt generation is set to generate
@@ -341,15 +341,15 @@ public class TransactionProcess implements HandleUrlInterface {
         handUrl=new HandleUrl(this,context,context.getResources().getString(R.string.transactionurl),context.getResources().getString(R.string.post),mc.mapping(st));
     }
 
-    public void incrementIndex(int nozzleId, Double currentIndex, Double valueToAdd){
-        Log.d(tag,"Updating nozzle: "+nozzleId+"'s Indexes");
-        Nozzle nozzle=db.getSingleNozzle(nozzleId);
-        Double newIndex=currentIndex+valueToAdd;
-        nozzle.setNozzleIndex(newIndex);
-        long dbId=db.updateNozzle(nozzle);
-        Log.v(tag,"Nozzle "+dbId+" Updated");
-        Log.v(tag, "Synchronisation finished, Sending a refresh Broadcast Command");
-        Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh_processTransaction");
-        context.sendBroadcast(i);
-    }
+//    public void incrementIndex(int nozzleId, Double currentIndex, Double valueToAdd){
+//        Log.d(tag,"Updating nozzle: "+nozzleId+"'s Indexes");
+//        Nozzle nozzle=db.getSingleNozzle(nozzleId);
+//        Double newIndex=currentIndex+valueToAdd;
+//        nozzle.setNozzleIndex(newIndex);
+//        long dbId=db.updateNozzle(nozzle);
+//        Log.v(tag,"Nozzle "+dbId+" Updated");
+//        Log.v(tag, "Synchronisation finished, Sending a refresh Broadcast Command");
+//        Intent i = new Intent("com.aub.oltranz.payfuel.MAIN_SERVICE").putExtra("msg", "refresh_processTransaction");
+//        context.sendBroadcast(i);
+//    }
 }

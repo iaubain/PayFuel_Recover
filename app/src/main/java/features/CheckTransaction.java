@@ -10,10 +10,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.mysppayfuel.R;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -30,19 +29,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-import appBean.AsyncResponce;
 import appBean.CheckTransactionResponse;
 import appBean.MyTransactionBean;
 import databaseBean.DBHelper;
 import entities.AsyncTransaction;
 import entities.Nozzle;
 import entities.SellingTransaction;
-import features.PreferenceManager;
-import features.PrintHandler;
 import models.MapperClass;
-import models.TransactionPrint;
 import models.TransactionToCheck;
 
 public class CheckTransaction extends Service {
@@ -66,7 +60,6 @@ public class CheckTransaction extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 

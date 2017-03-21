@@ -3,7 +3,7 @@ package features;
 import android.content.Context;
 import android.util.Log;
 
-import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.mysppayfuel.R;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

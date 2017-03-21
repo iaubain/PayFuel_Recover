@@ -5,7 +5,7 @@ package config;
  */
 
 public class BaseUrl {
-    public static final String BASE_URL="http://41.74.172.132:8080/EngenPayFuel/";
+    public static final String BASE_URL="http://41.74.172.132:8080/SpPayFuel/";
     public static final String LOGIN_URL="AndroidWebService/pos/login";
     public static final String REGISTER_URL="DeviceManagementService/device/register";
     public static final String GET_PUMPS_URL="PumpManagementService/pumpsbyuser/";

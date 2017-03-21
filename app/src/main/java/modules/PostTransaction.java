@@ -56,7 +56,7 @@ public class PostTransaction {
                         mListener.onTransactionPost(false, CONNECTIVITY_ERROR, sellingTransaction);
                         return;
                     }
-                    Log.d("Server response", new DataFactory().objectToString(transactionResponse));
+                    Log.d("Server response: ", new DataFactory().objectToString(transactionResponse));
                     mListener.onTransactionPost(true, transactionResponse.getStatusCode(), sellingTransaction);
                 }
 

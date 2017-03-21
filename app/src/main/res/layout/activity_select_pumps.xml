@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/main_background"
     android:padding="4dp"
-    tools:context="com.aub.oltranz.payfuel.SelectPumps">
+    tools:context="com.aub.oltranz.mysppayfuel.SelectPumps">
 
     <TableRow
         android:id="@+id/header"

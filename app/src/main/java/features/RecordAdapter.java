@@ -13,15 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aub.oltranz.payfuel.R;
-import com.aub.oltranz.payfuel.Selling;
+import com.aub.oltranz.mysppayfuel.R;
 
 import java.util.List;
 
 import databaseBean.DBHelper;
 import entities.Nozzle;
 import entities.SellingTransaction;
-import models.TransactionPrint;
 import modules.TransactionPrintModule;
 
 /**
@@ -82,7 +80,7 @@ public class RecordAdapter extends ArrayAdapter<SellingTransaction> implements T
         }
         else if(st.getStatus()==301 || st.getStatus()==302){
             holder.payInfo.setText(st.getDeviceTransactionTime()+" /"+db.getSinglePaymentMode(st.getPaymentModeId()).getName()+" /"+st.getAmount()+"Rwf /Pending");
-            holder.payInfo.setTextColor(ContextCompat.getColor(context, R.color.tab_highlight));
+            holder.payInfo.setTextColor(ContextCompat.getColor(context, R.color.darkgray));
 
             holder.print.setEnabled(false);
             holder.print.setClickable(false);

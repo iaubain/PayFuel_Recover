@@ -6,7 +6,7 @@
     android:id="@+id/nozzlelayout"
     android:orientation="vertical"
     android:padding="4dp"
-    tools:context="com.aub.oltranz.payfuel.Report">
+    tools:context="com.aub.oltranz.mysppayfuel.Report">
 <TableRow
     android:id="@+id/topBlock"
     android:layout_alignParentTop="true"

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "com.aub.oltranz.payfuel"
+        applicationId "com.aub.oltranz.mysppayfuel"
         minSdkVersion 17
         targetSdkVersion 24
         versionCode 1

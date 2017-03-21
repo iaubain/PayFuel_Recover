@@ -8,7 +8,7 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp"
     android:orientation="vertical"
-    tools:context="com.aub.oltranz.payfuel.SelectPumps">
+    tools:context="com.aub.oltranz.mysppayfuel.SelectPumps">
 
     <TableRow
         android:layout_width="match_parent"

@@ -30,7 +30,8 @@ public class MapperClass {
         Log.d(tag,"mapping object starts...");
         mapper= new ObjectMapper();
 
-        mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             jsonData=mapper.writeValueAsString(object);
             Log.d(tag,"mapping object ended with a result: "+jsonData);
@@ -54,7 +55,8 @@ public class MapperClass {
             Log.d(tag,"Response redirected to DeviceRegistrationResponse");
             mapper= new ObjectMapper();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
                 DeviceRegistrationResponse drr =mapper.readValue(urlResult,DeviceRegistrationResponse.class);
                 Log.d(tag,"mapped Object is: "+drr.getClass().getSimpleName());
@@ -71,7 +73,8 @@ public class MapperClass {
             Log.d(tag,"Response redirected to LoginResponse");
             mapper= new ObjectMapper();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
                 LoginResponse lr =mapper.readValue(urlResult,LoginResponse.class);
                 Log.d(tag,"mapped Object is: "+lr.getClass().getSimpleName());
@@ -88,7 +91,8 @@ public class MapperClass {
             Log.d(tag,"Response redirected to LoadPumpsResponse");
             mapper= new ObjectMapper();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
                 LoadPumpsResponse lpr =mapper.readValue(urlResult,LoadPumpsResponse.class);
                 Log.d(tag,"mapped Object is: "+lpr.getClass().getSimpleName());
@@ -105,7 +109,8 @@ public class MapperClass {
             Log.d(tag,"Response redirected to PaymentModeResponse");
             mapper= new ObjectMapper();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
                 PaymentModeResponse pmr =mapper.readValue(urlResult,PaymentModeResponse.class);
                 Log.d(tag,"mapped Object is: "+pmr.getClass().getSimpleName());
@@ -122,7 +127,8 @@ public class MapperClass {
             Log.d(tag,"Response redirected to ChoosenPumpResponse");
             mapper= new ObjectMapper();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
                 ChoosenPumpResponse cpr =mapper.readValue(urlResult,ChoosenPumpResponse.class);
                 Log.d(tag,"mapped Object is: "+cpr.getClass().getSimpleName());
@@ -139,7 +145,8 @@ public class MapperClass {
             Log.d(tag,"Response redirected to LogoutResponse");
             mapper= new ObjectMapper();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
                 LogoutResponse lr =mapper.readValue(urlResult,LogoutResponse.class);
                 Log.d(tag,"mapped Object is: "+lr.getClass().getSimpleName());
@@ -156,7 +163,8 @@ public class MapperClass {
             Log.d(tag,"Response redirected to TransactionResponse");
             mapper= new ObjectMapper();
 
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
                 TransactionResponse tr =mapper.readValue(urlResult,TransactionResponse.class);
                 Log.d(tag,"mapped Object is: "+tr.getClass().getSimpleName());

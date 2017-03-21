@@ -6,7 +6,7 @@
     android:id="@+id/nozzlelayout"
     android:orientation="vertical"
     android:padding="4dp"
-    tools:context="com.aub.oltranz.payfuel.Selling">
+    tools:context="com.aub.oltranz.mysppayfuel.Selling">
 
     <TextView
         android:layout_width="wrap_content"

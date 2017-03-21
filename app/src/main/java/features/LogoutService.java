@@ -10,7 +10,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.mysppayfuel.R;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;

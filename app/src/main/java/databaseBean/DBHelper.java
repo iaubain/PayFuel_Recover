@@ -31,7 +31,7 @@ import entities.WorkStatus;
 public class DBHelper extends SQLiteOpenHelper {
 
     //database name
-    public static final String DATABASE_NAME = "payfuel.db";
+    public static final String DATABASE_NAME = "sppayfuel.db";
     //______________Database fields and variables____________________\\
     //device
     public static final String deviceTable="device";

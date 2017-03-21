@@ -74,30 +74,30 @@ public class PeriodicTransactionService extends IntentService implements PostTra
     public void onTransactionPost(boolean status, int serverStatus, SellingTransaction sellingTransaction) {
         if(status){
             SellingTransaction st = db.getSingleTransaction(sellingTransaction.getDeviceTransactionId());
-            if(st.getStatus() == 100){
-                incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
-            }
+//            if(st.getStatus() == 100){
+//                incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
+//            }
 
             if(serverStatus == 100){
                 if(st.getStatus() == 301){
                     st.setStatus(serverStatus);
                     updateLocalTransaction(st);
-                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), Double.valueOf(st.getQuantity()));
+//                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
                 }else if(st.getStatus() == 302){
                     st.setStatus(serverStatus);
                     updateLocalTransaction(st);
                     generateReceipt(st);
-                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), Double.valueOf(st.getQuantity()));
-                }else if(st.getStatus() == 101){
+//                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
+                }else if(st.getStatus() == 101 || st.getStatus() == 100){
                     st.setStatus(serverStatus);
                     updateLocalTransaction(st);
-                    generateReceipt(st);
-                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
+                    //generateReceipt(st);
+//                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
                 }else if(st.getStatus() == 500 || st.getStatus() == 500){
                     st.setStatus(serverStatus);
                     updateLocalTransaction(st);
                     generateReceipt(st);
-                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
+//                    incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
                 }
                 db.deleteAsyncTransaction(sellingTransaction.getDeviceTransactionId());
             }else if(serverStatus == 301){
@@ -118,8 +118,11 @@ public class PeriodicTransactionService extends IntentService implements PostTra
                     db.deleteAsyncTransaction(sellingTransaction.getDeviceTransactionId());
                 }
                 }
+
+                incrementIndex(db.getSingleNozzle(st.getNozzleId()), st.getQuantity());
             }else{
                 Log.i(tag, "Server status: "+ serverStatus);
+                Toast.makeText(getApplicationContext(), "CONNECTIVITY STATUS: "+ serverStatus, Toast.LENGTH_LONG).show();
             }
         }else{
             switch(serverStatus){
@@ -160,10 +163,14 @@ public class PeriodicTransactionService extends IntentService implements PostTra
         }
     }
 
-    public void incrementIndex(Nozzle nozzle, Double addValue){
+    private void incrementIndex(Nozzle nozzle, Double reduceValue){
         Log.d("Nozzle","Updating nozzle: "+nozzle.getNozzleId()+"'s Indexes");
-        Double newIndex=nozzle.getNozzleIndex()+addValue;
-        nozzle.setNozzleIndex(newIndex);
+        if(nozzle.getNozzleIndex()>reduceValue){
+            Double newIndex=nozzle.getNozzleIndex()-reduceValue;
+            nozzle.setNozzleIndex(newIndex);
+        }else{
+            nozzle.setNozzleIndex(0.0);
+        }
         long dbId=db.updateNozzle(nozzle);
         Log.v("Nozzle","Nozzle "+dbId+" Updated");
         Log.v("Nozzle", "Synchronisation finished, Sending a refresh Broadcast Command");

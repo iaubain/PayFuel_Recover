@@ -6,7 +6,7 @@
     android:id="@+id/nozzlelayout"
     android:background="@color/appWhite"
     android:padding="4dp"
-    tools:context="com.aub.oltranz.payfuel.Report">
+    tools:context="com.aub.oltranz.mysppayfuel.Report">
 
     <TextView
         android:layout_width="wrap_content"

@@ -9,7 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.mysppayfuel.R;
 
 import java.util.List;
 
@@ -86,7 +86,7 @@ public class PaymentAdapter extends BaseAdapter {
         }else if(pm.getName().equalsIgnoreCase("debt")){
             pName.setText(pm.getName());
             pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.debt, 0, 0);
-        }else if(pm.getName().equalsIgnoreCase("engen card")){
+        }else if(pm.getName().equalsIgnoreCase("engen card") || pm.getName().equalsIgnoreCase("sp card")){
             pName.setText(pm.getName());
             pName.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.engenonecard, 0, 0);
         }else{

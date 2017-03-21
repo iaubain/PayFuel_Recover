@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.mysppayfuel.R;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;

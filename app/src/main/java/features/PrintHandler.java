@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.aub.oltranz.payfuel.R;
+import com.aub.oltranz.mysppayfuel.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -169,11 +169,11 @@ public class PrintHandler {
         thermalPrinter.setStep(10);
         thermalPrinter.setFont(ThermalPrinter.HZK24F, ThermalPrinter.ASC12X24);
 
-        thermalPrinter.print("ENGEN RWANDA\n");
-        thermalPrinter.print("Gasabo, Kigali/Rwanda\n");
-        thermalPrinter.print("TeL: (250) 788 175 111/(250) 788 304 747\n");
-        thermalPrinter.print("B.P. 1342, KIGALI-RWANDA\n");
-        thermalPrinter.print("Registration Number(TIN): 101835101\n\n");
+        thermalPrinter.print("SP PETROLIERE Ltd\n");
+        thermalPrinter.print("Nyarugenge, Kigali/Rwanda\n");
+        thermalPrinter.print("TeL: (250) 787 230 666/(250) 788 306 232\n");
+        thermalPrinter.print("B.P. 144 KIGALI-RWANDA\n");
+        thermalPrinter.print("Registration Number(TIN): 100222174\n\n");
 
         thermalPrinter.setFont(ThermalPrinter.ASC12X24YB, ThermalPrinter.HZK24F);
 
